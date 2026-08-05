@@ -15,6 +15,10 @@ being asked again:
    including any non-obvious fixes or trade-offs.
 3. **Push** — `git push` to `master`.
 
+4. **Summarize briefly** — end every reply with a short summary. A few lines or
+   bullets. Do not restate the whole diff; surface what changed, what was
+   verified, and anything that still needs a decision.
+
 Notes:
 - The working branch for this project is `master` (not `main`).
 - Do not commit `.env`; it is gitignored and holds live Supabase keys.

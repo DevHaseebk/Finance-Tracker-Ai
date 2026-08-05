@@ -18,8 +18,15 @@ export interface Category {
   color?: string;
 }
 
-export type RootStackParamList = {
+/** Screens shown while logged out. */
+export type AuthStackParamList = {
   Welcome: undefined;
+  Login: undefined;
+  SignUp: undefined;
+};
+
+/** Screens shown once a session exists. */
+export type RootStackParamList = {
   Tabs: undefined;
   TransactionDetail: { id: string };
 };

@@ -4,23 +4,19 @@ import { BlurView } from 'expo-blur';
 import { MotiView } from 'moti';
 import { Sparkles, ArrowRight } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import * as Haptics from 'expo-haptics';
-import Toast from 'react-native-toast-message';
 import AnimatedPressable from '../components/AnimatedPressable';
 import { colors, radius, spacing, typography, motion, staggerDelay } from '../lib/theme';
-import type { RootStackParamList } from '../types';
+import type { AuthStackParamList } from '../types';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
+type Props = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
 
 export default function WelcomeScreen({ navigation }: Props) {
   const handleGetStarted = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Toast.show({
-      type: 'success',
-      text1: 'Animation pipeline ready',
-      text2: 'Reanimated, Moti, gradients & blur all working.',
-    });
-    navigation.replace('Tabs');
+    navigation.navigate('SignUp');
+  };
+
+  const handleSignIn = () => {
+    navigation.navigate('Login');
   };
 
   return (
@@ -74,6 +70,17 @@ export default function WelcomeScreen({ navigation }: Props) {
           >
             <Text style={styles.ctaText}>Get Started</Text>
             <ArrowRight color={colors.primary} size={20} strokeWidth={2.5} />
+          </AnimatedPressable>
+
+          <AnimatedPressable
+            onPress={handleSignIn}
+            haptic="light"
+            scaleTo={0.97}
+            style={styles.secondaryCta}
+            accessibilityRole="button"
+            accessibilityLabel="Sign in to an existing account"
+          >
+            <Text style={styles.secondaryCtaText}>I already have an account</Text>
           </AnimatedPressable>
         </MotiView>
       </View>
@@ -164,5 +171,15 @@ const styles = StyleSheet.create({
   ctaText: {
     ...typography.bodyMedium,
     color: colors.primary,
+  },
+  secondaryCta: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.lg,
+    marginTop: spacing.sm,
+  },
+  secondaryCtaText: {
+    ...typography.caption,
+    color: 'rgba(255, 255, 255, 0.9)',
   },
 });
