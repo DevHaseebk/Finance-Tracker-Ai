@@ -1,13 +1,18 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MotiView } from 'moti';
-import { LogOut, Mail } from 'lucide-react-native';
+import { LogOut, Mail, Tag, ChevronRight } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import AnimatedPressable from '../components/AnimatedPressable';
 import { useAuthStore } from '../store/authStore';
 import { colors, motion, radius, shadow, spacing, typography } from '../lib/theme';
+import { FAB_CLEARANCE } from '../components/FloatingActionButton';
+import type { RootStackParamList } from '../types';
 
 export default function SettingsScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const isSubmitting = useAuthStore((s) => s.isSubmitting);
@@ -37,6 +42,25 @@ export default function SettingsScreen() {
           </View>
         </MotiView>
 
+        <MotiView {...motion.cardEntrance} delay={80}>
+          <AnimatedPressable
+            onPress={() => navigation.navigate('Categories')}
+            haptic="light"
+            scaleTo={0.98}
+            style={styles.card}
+            accessibilityRole="button"
+            accessibilityLabel="Manage categories"
+          >
+            <View style={styles.row}>
+              <Tag size={18} strokeWidth={2} color={colors.textSecondary} />
+              <View style={styles.rowText}>
+                <Text style={styles.rowValue}>Categories</Text>
+              </View>
+              <ChevronRight size={18} strokeWidth={2} color={colors.textMuted} />
+            </View>
+          </AnimatedPressable>
+        </MotiView>
+
         <AnimatedPressable
           onPress={handleLogout}
           disabled={isSubmitting}
@@ -64,6 +88,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: spacing.lg,
+    paddingBottom: FAB_CLEARANCE,
   },
   title: {
     ...typography.h1,

@@ -14,8 +14,10 @@ export interface Transaction {
 export interface Category {
   id: string;
   name: string;
+  type: TransactionType;
   icon?: string;
   color?: string;
+  isDefault?: boolean;
 }
 
 /** Screens shown while logged out. */
@@ -28,12 +30,15 @@ export type AuthStackParamList = {
 /** Screens shown once a session exists. */
 export type RootStackParamList = {
   Tabs: undefined;
+  /** Presented modally over the tabs from the floating action button. */
+  AddTransaction: undefined;
+  Categories: undefined;
   TransactionDetail: { id: string };
 };
 
 export type TabParamList = {
-  Home: undefined;
-  Transactions: undefined;
-  Insights: undefined;
+  Dashboard: undefined;
+  History: undefined;
+  Analytics: undefined;
   Settings: undefined;
 };
