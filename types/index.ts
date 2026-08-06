@@ -3,11 +3,11 @@ export type TransactionType = 'income' | 'expense';
 export interface Transaction {
   id: string;
   userId: string;
+  categoryId: string;
   amount: number;
   type: TransactionType;
-  category: string;
   note?: string;
-  date: string; // ISO string
+  date: string; // yyyy-MM-dd, matches the Postgres `date` column
   createdAt: string;
 }
 
@@ -31,8 +31,9 @@ export type AuthStackParamList = {
 /** Screens shown once a session exists. */
 export type RootStackParamList = {
   Tabs: undefined;
-  /** Presented modally over the tabs from the floating action button. */
-  AddTransaction: undefined;
+  /** Presented modally over the tabs from the floating action button. Omit
+   * transactionId to create; pass it to edit an existing transaction. */
+  AddTransaction: { transactionId?: string } | undefined;
   Categories: undefined;
   /** Omit categoryId to create; pass it to edit an existing custom category. */
   CategoryForm: { categoryId?: string } | undefined;
