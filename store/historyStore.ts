@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import Toast from 'react-native-toast-message';
 import { supabase } from '../lib/supabase';
 import type { TransactionWithCategory } from '../types';
 
@@ -110,6 +111,7 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
 
     if (error) {
       set({ isLoading: false, error: error.message });
+      Toast.show({ type: 'error', text1: "Couldn't load transactions", text2: error.message });
       return;
     }
 
@@ -141,6 +143,11 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
 
     if (error) {
       set({ isLoadingMore: false, error: error.message });
+      Toast.show({
+        type: 'error',
+        text1: "Couldn't load more transactions",
+        text2: error.message,
+      });
       return;
     }
 

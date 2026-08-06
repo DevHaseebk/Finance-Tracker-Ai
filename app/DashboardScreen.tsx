@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,9 +15,19 @@ import {
 } from 'lucide-react-native';
 import AnimatedPressable from '../components/AnimatedPressable';
 import TransactionListItem from '../components/TransactionListItem';
+import DashboardSkeleton from '../components/DashboardSkeleton';
 import { useDashboardStore } from '../store/dashboardStore';
 import { formatCurrency, signedAmount } from '../lib/utils';
-import { colors, motion, radius, shadow, spacing, staggerDelay, typography } from '../lib/theme';
+import {
+  colors,
+  fontSize,
+  motion,
+  radius,
+  shadow,
+  spacing,
+  staggerDelay,
+  typography,
+} from '../lib/theme';
 import { FAB_CLEARANCE } from '../components/FloatingActionButton';
 import type { RootStackParamList } from '../types';
 
@@ -41,19 +51,36 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading && !!summary}
+            onRefresh={fetchDashboard}
+            tintColor={colors.primary}
+          />
+        }
+      >
         <MotiView {...motion.slideUp} delay={staggerDelay(0)}>
           <Text style={styles.title}>Dashboard</Text>
         </MotiView>
 
         {isLoading && !summary ? (
-          <View style={styles.loadingBlock}>
-            <ActivityIndicator color={colors.primary} />
-          </View>
-        ) : error ? (
+          <DashboardSkeleton />
+        ) : error && !summary ? (
           <View style={styles.errorBlock}>
             <AlertCircle size={28} strokeWidth={1.5} color={colors.danger} />
             <Text style={styles.errorText}>{error}</Text>
+            <AnimatedPressable
+              onPress={fetchDashboard}
+              haptic="light"
+              scaleTo={0.96}
+              style={styles.retryButton}
+              accessibilityRole="button"
+              accessibilityLabel="Retry loading dashboard"
+            >
+              <Text style={styles.retryText}>Retry</Text>
+            </AnimatedPressable>
           </View>
         ) : (
           <>
@@ -188,10 +215,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: spacing.xl,
   },
-  loadingBlock: {
-    paddingVertical: spacing.xxl,
-    alignItems: 'center',
-  },
   errorBlock: {
     paddingVertical: spacing.xxl,
     alignItems: 'center',
@@ -201,6 +224,16 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.danger,
     textAlign: 'center',
+  },
+  retryButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+  },
+  retryText: {
+    ...typography.bodyMedium,
+    color: colors.primary,
   },
   card: {
     backgroundColor: colors.card,
@@ -216,7 +249,7 @@ const styles = StyleSheet.create({
   },
   balanceValue: {
     fontFamily: 'Inter_700Bold',
-    fontSize: 36,
+    fontSize: fontSize.hero,
     marginBottom: spacing.sm,
   },
   breakdown: {

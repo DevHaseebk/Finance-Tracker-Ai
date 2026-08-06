@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import Toast from 'react-native-toast-message';
 import { supabase } from '../lib/supabase';
 import type { DashboardSummary, TransactionWithCategory } from '../types';
 
@@ -93,10 +94,10 @@ export const useDashboardStore = create<DashboardState>((set) => ({
     ]);
 
     if (summaryResult.error || recentResult.error) {
-      set({
-        isLoading: false,
-        error: (summaryResult.error ?? recentResult.error)?.message ?? 'Failed to load dashboard.',
-      });
+      const message =
+        (summaryResult.error ?? recentResult.error)?.message ?? 'Failed to load dashboard.';
+      set({ isLoading: false, error: message });
+      Toast.show({ type: 'error', text1: "Couldn't load dashboard", text2: message });
       return;
     }
 

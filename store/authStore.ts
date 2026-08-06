@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Session, User } from '@supabase/supabase-js';
+import Toast from 'react-native-toast-message';
 import { supabase } from '../lib/supabase';
 import { friendlyAuthError } from '../lib/validation';
 
@@ -43,6 +44,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       })
       .catch(() => {
         set({ isInitializing: false });
+        Toast.show({
+          type: 'error',
+          text1: "Couldn't restore your session",
+          text2: 'Please sign in again.',
+        });
       });
 
     const {

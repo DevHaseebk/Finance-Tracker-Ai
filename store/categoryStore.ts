@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import Toast from 'react-native-toast-message';
 import { supabase } from '../lib/supabase';
 import { friendlyCategoryDeleteError } from '../lib/validation';
 import type { Category, TransactionType } from '../types';
@@ -69,6 +70,7 @@ export const useCategoryStore = create<CategoryState>((set, get) => ({
 
     if (error) {
       set({ isLoading: false, error: error.message });
+      Toast.show({ type: 'error', text1: "Couldn't load categories", text2: error.message });
       return;
     }
     set({ categories: (data ?? []).map(mapRow), isLoading: false });

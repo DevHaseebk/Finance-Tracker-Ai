@@ -28,6 +28,7 @@ export default function DayOfWeekPicker({ value, onChange }: DayOfWeekPickerProp
               haptic="none"
               scaleTo={0.88}
               style={[styles.cell, selected && styles.cellSelected]}
+              hitSlop={4}
               accessibilityRole="button"
               accessibilityState={{ selected }}
               accessibilityLabel={

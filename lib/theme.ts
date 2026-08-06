@@ -68,6 +68,10 @@ export const fontSize = {
   xl: 22,
   xxl: 28,
   display: 34,
+  // Large single-value readouts (e.g. Dashboard's total balance).
+  hero: 36,
+  // The editable amount field on Add Transaction / Recurring forms.
+  jumbo: 52,
 } as const;
 
 export const fontWeight = {

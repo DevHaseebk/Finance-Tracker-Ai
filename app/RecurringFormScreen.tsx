@@ -26,7 +26,7 @@ import RecurrenceFields from '../components/RecurrenceFields';
 import { useCategoryStore } from '../store/categoryStore';
 import { useRecurringStore } from '../store/recurringStore';
 import { formatCurrency } from '../lib/utils';
-import { colors, motion, radius, spacing, typography } from '../lib/theme';
+import { colors, fontSize, motion, radius, spacing, typography } from '../lib/theme';
 import type { RecurringFrequency, RootStackParamList, TransactionType } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecurringForm'>;
@@ -190,6 +190,7 @@ export default function RecurringFormScreen({ navigation, route }: Props) {
           haptic="light"
           scaleTo={0.9}
           style={styles.close}
+          hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Close"
         >
@@ -376,7 +377,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontFamily: 'Inter_700Bold',
-    fontSize: 52,
+    fontSize: fontSize.jumbo,
   },
   section: {
     marginBottom: spacing.lg,

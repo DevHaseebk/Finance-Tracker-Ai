@@ -106,6 +106,7 @@ export default function CategoriesScreen({ navigation }: Props) {
               haptic="light"
               scaleTo={0.85}
               style={styles.actionButton}
+              hitSlop={8}
               accessibilityRole="button"
               accessibilityLabel={`Edit ${category.name}`}
             >
@@ -125,6 +126,7 @@ export default function CategoriesScreen({ navigation }: Props) {
           haptic="light"
           scaleTo={0.9}
           style={styles.headerButton}
+          hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
@@ -136,6 +138,7 @@ export default function CategoriesScreen({ navigation }: Props) {
           haptic="medium"
           scaleTo={0.9}
           style={[styles.headerButton, styles.addButton]}
+          hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Add category"
         >
@@ -151,11 +154,24 @@ export default function CategoriesScreen({ navigation }: Props) {
         <View style={styles.center}>
           <AlertCircle size={32} strokeWidth={1.5} color={colors.danger} />
           <Text style={styles.errorText}>{error}</Text>
+          <AnimatedPressable
+            onPress={fetchCategories}
+            haptic="light"
+            scaleTo={0.96}
+            style={styles.retryButton}
+            accessibilityRole="button"
+            accessibilityLabel="Retry loading categories"
+          >
+            <Text style={styles.retryText}>Retry</Text>
+          </AnimatedPressable>
         </View>
       ) : categories.length === 0 ? (
         <View style={styles.center}>
           <Tag size={36} strokeWidth={1.5} color={colors.textMuted} />
-          <Text style={styles.emptyText}>No categories yet.</Text>
+          <Text style={styles.emptyTitle}>No categories yet</Text>
+          <Text style={styles.emptyHint}>
+            Tap the + button above to create your first category.
+          </Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
@@ -220,9 +236,25 @@ const styles = StyleSheet.create({
     color: colors.danger,
     textAlign: 'center',
   },
-  emptyText: {
+  retryButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+  },
+  retryText: {
+    ...typography.bodyMedium,
+    color: colors.primary,
+  },
+  emptyTitle: {
+    ...typography.h3,
+    color: colors.text,
+  },
+  emptyHint: {
     ...typography.caption,
     color: colors.textSecondary,
+    textAlign: 'center',
+    maxWidth: 260,
   },
   list: {
     padding: spacing.lg,

@@ -121,6 +121,7 @@ export default function CategoryFormScreen({ navigation, route }: Props) {
           haptic="light"
           scaleTo={0.9}
           style={styles.close}
+          hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Close"
         >

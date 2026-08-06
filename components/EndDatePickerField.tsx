@@ -82,6 +82,7 @@ export default function EndDatePickerField({
             haptic="none"
             scaleTo={0.85}
             style={styles.clearButton}
+            hitSlop={{ top: 8, bottom: 8, right: 8, left: 4 }}
             accessibilityRole="button"
             accessibilityLabel="Clear end date"
           >

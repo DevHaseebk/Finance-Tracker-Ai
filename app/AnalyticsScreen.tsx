@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { MotiView } from 'moti';
 import { ChartColumn, AlertCircle, TrendingUp, PieChart as PieChartIcon } from 'lucide-react-native';
+import AnimatedPressable from '../components/AnimatedPressable';
 import TypeToggle from '../components/TypeToggle';
 import RangeSelector from '../components/RangeSelector';
 import DonutChart from '../components/DonutChart';
@@ -11,6 +12,8 @@ import CategoryLegend from '../components/CategoryLegend';
 import TrendBarChart from '../components/TrendBarChart';
 import SavingsLineChart from '../components/SavingsLineChart';
 import TopCategoriesList from '../components/TopCategoriesList';
+import Skeleton from '../components/Skeleton';
+import AnalyticsSkeleton from '../components/AnalyticsSkeleton';
 import { useAnalyticsStore } from '../store/analyticsStore';
 import { RANGE_PRESET_LABELS } from '../lib/analyticsRange';
 import { colors, motion, radius, shadow, spacing, staggerDelay, typography } from '../lib/theme';
@@ -43,6 +46,27 @@ export default function AnalyticsScreen() {
   const hasTrendData = monthlyTrend.some((p) => p.income > 0 || p.expense > 0);
   const hasSavingsData = savingsTrend.length > 0;
 
+  const isInitialLoad =
+    isLoadingBreakdown &&
+    isLoadingTrends &&
+    expenseBreakdown.length === 0 &&
+    incomeBreakdown.length === 0 &&
+    monthlyTrend.length === 0 &&
+    savingsTrend.length === 0;
+
+  if (isInitialLoad) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <MotiView {...motion.slideUp}>
+            <Text style={styles.title}>Analytics</Text>
+          </MotiView>
+          <AnalyticsSkeleton />
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -58,6 +82,19 @@ export default function AnalyticsScreen() {
           <View style={styles.errorBlock}>
             <AlertCircle size={28} strokeWidth={1.5} color={colors.danger} />
             <Text style={styles.errorText}>{error}</Text>
+            <AnimatedPressable
+              onPress={() => {
+                fetchBreakdown();
+                fetchTrends();
+              }}
+              haptic="light"
+              scaleTo={0.96}
+              style={styles.retryButton}
+              accessibilityRole="button"
+              accessibilityLabel="Retry loading analytics"
+            >
+              <Text style={styles.retryText}>Retry</Text>
+            </AnimatedPressable>
           </View>
         ) : null}
 
@@ -73,8 +110,13 @@ export default function AnalyticsScreen() {
           </View>
 
           {isLoadingBreakdown && activeBreakdown.length === 0 ? (
-            <View style={styles.centerBlock}>
-              <ActivityIndicator color={colors.primary} />
+            <View style={styles.breakdownBody}>
+              <Skeleton width={168} height={168} radius={84} />
+              <View style={styles.legendWrapper}>
+                {[0, 1, 2].map((i) => (
+                  <Skeleton key={i} height={20} style={styles.mb8} delay={i * 40} />
+                ))}
+              </View>
             </View>
           ) : activeBreakdown.length === 0 ? (
             <View style={styles.emptyBlock}>
@@ -102,8 +144,10 @@ export default function AnalyticsScreen() {
           <Text style={styles.cardSubtitle}>{RANGE_PRESET_LABELS[rangePreset]}</Text>
 
           {isLoadingBreakdown && expenseBreakdown.length === 0 ? (
-            <View style={styles.centerBlock}>
-              <ActivityIndicator color={colors.primary} />
+            <View style={styles.topListWrapper}>
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} height={28} style={styles.mb8} delay={i * 40} />
+              ))}
             </View>
           ) : expenseBreakdown.length === 0 ? (
             <View style={styles.emptyBlock}>
@@ -123,8 +167,8 @@ export default function AnalyticsScreen() {
           <Text style={styles.cardSubtitle}>Last 6 months</Text>
 
           {isLoadingTrends && monthlyTrend.length === 0 ? (
-            <View style={styles.centerBlock}>
-              <ActivityIndicator color={colors.primary} />
+            <View style={styles.chartWrapper}>
+              <Skeleton height={160} radius={radius.md} />
             </View>
           ) : !hasTrendData ? (
             <View style={styles.emptyBlock}>
@@ -144,8 +188,8 @@ export default function AnalyticsScreen() {
           <Text style={styles.cardSubtitle}>Cumulative balance, last 6 months</Text>
 
           {isLoadingTrends && savingsTrend.length === 0 ? (
-            <View style={styles.centerBlock}>
-              <ActivityIndicator color={colors.primary} />
+            <View style={styles.chartWrapper}>
+              <Skeleton height={160} radius={radius.md} />
             </View>
           ) : !hasSavingsData ? (
             <View style={styles.emptyBlock}>
@@ -187,6 +231,16 @@ const styles = StyleSheet.create({
     color: colors.danger,
     textAlign: 'center',
   },
+  retryButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+  },
+  retryText: {
+    ...typography.bodyMedium,
+    color: colors.primary,
+  },
   card: {
     backgroundColor: colors.card,
     borderRadius: radius.lg,
@@ -226,9 +280,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     alignItems: 'center',
   },
-  centerBlock: {
-    paddingVertical: spacing.xxl,
-    alignItems: 'center',
+  mb8: {
+    marginBottom: spacing.sm,
   },
   emptyBlock: {
     alignItems: 'center',

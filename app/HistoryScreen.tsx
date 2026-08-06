@@ -10,10 +10,11 @@ import TransactionListItem from '../components/TransactionListItem';
 import MonthYearFilter from '../components/MonthYearFilter';
 import CategoryFilterChips from '../components/CategoryFilterChips';
 import SearchInput from '../components/SearchInput';
+import HistorySkeleton from '../components/HistorySkeleton';
 import { useHistoryStore } from '../store/historyStore';
 import { useCategoryStore } from '../store/categoryStore';
 import { groupTransactionsByDate } from '../lib/utils';
-import { colors, motion, spacing, typography } from '../lib/theme';
+import { colors, motion, radius, spacing, typography } from '../lib/theme';
 import { FAB_CLEARANCE } from '../components/FloatingActionButton';
 import type { RootStackParamList, TransactionWithCategory } from '../types';
 
@@ -125,13 +126,21 @@ export default function HistoryScreen() {
         }
         ListEmptyComponent={
           isLoading ? (
-            <View style={styles.center}>
-              <ActivityIndicator color={colors.primary} />
-            </View>
+            <HistorySkeleton />
           ) : error ? (
             <View style={styles.center}>
               <AlertCircle size={32} strokeWidth={1.5} color={colors.danger} />
               <Text style={styles.errorText}>{error}</Text>
+              <AnimatedPressable
+                onPress={fetchFirstPage}
+                haptic="light"
+                scaleTo={0.96}
+                style={styles.retryButton}
+                accessibilityRole="button"
+                accessibilityLabel="Retry loading transactions"
+              >
+                <Text style={styles.retryText}>Retry</Text>
+              </AnimatedPressable>
             </View>
           ) : hasActiveFilters ? (
             <MotiView {...motion.fadeIn} delay={120} style={styles.empty}>
@@ -219,6 +228,16 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.danger,
     textAlign: 'center',
+  },
+  retryButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+  },
+  retryText: {
+    ...typography.bodyMedium,
+    color: colors.primary,
   },
   empty: {
     flex: 1,

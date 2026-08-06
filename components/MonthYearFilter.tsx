@@ -75,6 +75,7 @@ export default function MonthYearFilter({ year, month, onChange }: MonthYearFilt
           haptic="none"
           scaleTo={0.85}
           style={styles.stepButton}
+          hitSlop={6}
           accessibilityRole="button"
           accessibilityLabel="Previous month"
         >
@@ -97,6 +98,7 @@ export default function MonthYearFilter({ year, month, onChange }: MonthYearFilt
           haptic="none"
           scaleTo={0.85}
           style={styles.stepButton}
+          hitSlop={6}
           accessibilityRole="button"
           accessibilityLabel="Next month"
         >

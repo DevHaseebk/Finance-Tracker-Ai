@@ -27,7 +27,7 @@ import { useCategoryStore } from '../store/categoryStore';
 import { useTransactionStore } from '../store/transactionStore';
 import { useRecurringStore } from '../store/recurringStore';
 import { formatCurrency } from '../lib/utils';
-import { colors, motion, radius, shadow, spacing, typography } from '../lib/theme';
+import { colors, fontSize, motion, radius, shadow, spacing, typography } from '../lib/theme';
 import type { RecurringFrequency, RootStackParamList, TransactionType } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddTransaction'>;
@@ -213,6 +213,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
           haptic="light"
           scaleTo={0.9}
           style={styles.close}
+          hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Close"
         >
@@ -422,7 +423,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontFamily: 'Inter_700Bold',
-    fontSize: 52,
+    fontSize: fontSize.jumbo,
   },
   section: {
     marginBottom: spacing.lg,

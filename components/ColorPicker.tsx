@@ -29,6 +29,7 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
               haptic="none"
               scaleTo={0.85}
               style={[styles.swatch, { backgroundColor: color }]}
+              hitSlop={3}
               accessibilityRole="button"
               accessibilityState={{ selected }}
               accessibilityLabel={`Color ${color}`}

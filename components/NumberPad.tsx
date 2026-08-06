@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Delete } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, typography } from '../lib/theme';
+import { colors, fontFamily, fontSize, radius } from '../lib/theme';
 
 interface NumberPadProps {
   onDigit: (digit: string) => void;
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
   keyLabel: {
-    ...typography.display,
-    fontSize: 26,
+    fontFamily: fontFamily.semibold,
+    fontSize: fontSize.xxl,
     color: colors.text,
   },
 });

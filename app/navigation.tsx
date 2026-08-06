@@ -14,7 +14,7 @@ import {
   Settings as SettingsIcon,
 } from 'lucide-react-native';
 import type { AuthStackParamList, RootStackParamList, TabParamList } from '../types';
-import { colors, spacing } from '../lib/theme';
+import { colors, fontSize, spacing } from '../lib/theme';
 import { useAuthStore } from '../store/authStore';
 import FloatingActionButton from '../components/FloatingActionButton';
 import WelcomeScreen from './WelcomeScreen';
@@ -50,7 +50,7 @@ function Tabs() {
         },
         tabBarLabelStyle: {
           fontFamily: 'Inter_500Medium',
-          fontSize: 11,
+          fontSize: fontSize.xs,
         },
       }}
       screenListeners={{

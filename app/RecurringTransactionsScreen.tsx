@@ -87,6 +87,7 @@ export default function RecurringTransactionsScreen({ navigation }: Props) {
           haptic="light"
           scaleTo={0.85}
           style={styles.actionButton}
+          hitSlop={{ top: 8, bottom: 8, right: 8, left: 2 }}
           accessibilityRole="button"
           accessibilityLabel={`Edit ${rule.categoryName} recurring transaction`}
         >
@@ -104,6 +105,7 @@ export default function RecurringTransactionsScreen({ navigation }: Props) {
           haptic="light"
           scaleTo={0.9}
           style={styles.headerButton}
+          hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
@@ -115,6 +117,7 @@ export default function RecurringTransactionsScreen({ navigation }: Props) {
           haptic="medium"
           scaleTo={0.9}
           style={[styles.headerButton, styles.addButton]}
+          hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Add recurring transaction"
         >
@@ -130,6 +133,16 @@ export default function RecurringTransactionsScreen({ navigation }: Props) {
         <View style={styles.center}>
           <AlertCircle size={32} strokeWidth={1.5} color={colors.danger} />
           <Text style={styles.errorText}>{error}</Text>
+          <AnimatedPressable
+            onPress={fetchRules}
+            haptic="light"
+            scaleTo={0.96}
+            style={styles.retryButton}
+            accessibilityRole="button"
+            accessibilityLabel="Retry loading recurring transactions"
+          >
+            <Text style={styles.retryText}>Retry</Text>
+          </AnimatedPressable>
         </View>
       ) : rules.length === 0 ? (
         <View style={styles.center}>
@@ -196,6 +209,16 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.danger,
     textAlign: 'center',
+  },
+  retryButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+  },
+  retryText: {
+    ...typography.bodyMedium,
+    color: colors.primary,
   },
   emptyText: {
     ...typography.caption,

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { format } from 'date-fns';
+import Toast from 'react-native-toast-message';
 import { supabase } from '../lib/supabase';
 import { getRangeForPreset } from '../lib/analyticsRange';
 import type {
@@ -97,10 +98,10 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
     ]);
 
     if (expenseResult.error || incomeResult.error) {
-      set({
-        isLoadingBreakdown: false,
-        error: (expenseResult.error ?? incomeResult.error)?.message ?? 'Failed to load breakdown.',
-      });
+      const message =
+        (expenseResult.error ?? incomeResult.error)?.message ?? 'Failed to load breakdown.';
+      set({ isLoadingBreakdown: false, error: message });
+      Toast.show({ type: 'error', text1: "Couldn't load breakdown", text2: message });
       return;
     }
 
@@ -120,10 +121,10 @@ export const useAnalyticsStore = create<AnalyticsState>((set, get) => ({
     ]);
 
     if (trendResult.error || savingsResult.error) {
-      set({
-        isLoadingTrends: false,
-        error: (trendResult.error ?? savingsResult.error)?.message ?? 'Failed to load trends.',
-      });
+      const message =
+        (trendResult.error ?? savingsResult.error)?.message ?? 'Failed to load trends.';
+      set({ isLoadingTrends: false, error: message });
+      Toast.show({ type: 'error', text1: "Couldn't load trends", text2: message });
       return;
     }
 
