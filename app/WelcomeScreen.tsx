@@ -55,7 +55,7 @@ export default function WelcomeScreen({ navigation }: Props) {
         <MotiView {...motion.cardEntrance} delay={staggerDelay(3, 80, 200)} style={styles.glassCardWrapper}>
           <BlurView intensity={40} tint="light" style={styles.glassCard}>
             <Text style={styles.glassCardTitle}>This week</Text>
-            <Text style={styles.glassCardValue}>$1,284.50</Text>
+            <Text style={styles.glassCardValue}>Rs 1,284.50</Text>
             <Text style={styles.glassCardHint}>12% less than last week</Text>
           </BlurView>
         </MotiView>

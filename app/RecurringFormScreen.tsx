@@ -31,7 +31,7 @@ import type { RecurringFrequency, RootStackParamList, TransactionType } from '..
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecurringForm'>;
 
-const MAX_AMOUNT_CENTS = 99_999_999; // $999,999.99
+const MAX_AMOUNT_CENTS = 99_999_999; // Rs 999,999.99
 
 export default function RecurringFormScreen({ navigation, route }: Props) {
   const { recurringId } = route.params;

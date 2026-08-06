@@ -1,13 +1,20 @@
 import { format, isToday, isYesterday } from 'date-fns';
 import type { TransactionWithCategory } from '../types';
 
-export function formatCurrency(amount: number, currency = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
+/** Displayed before every amount in the app. */
+export const CURRENCY_SYMBOL = 'Rs';
+
+export function formatCurrency(amount: number): string {
+  // Formatted manually rather than with `style: 'currency'` — Intl renders PKR
+  // as "PKR 1,234.00" and its locale data isn't guaranteed on Hermes, so the
+  // grouping is taken from en-US (identical to how PKR is written) and the
+  // symbol is prefixed here.
+  const formatted = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(amount);
+  }).format(Math.abs(amount));
+
+  return `${amount < 0 ? '-' : ''}${CURRENCY_SYMBOL} ${formatted}`;
 }
 
 export function formatDate(date: string | Date, pattern = 'MMM d, yyyy'): string {
@@ -15,7 +22,7 @@ export function formatDate(date: string | Date, pattern = 'MMM d, yyyy'): string
   return format(value, pattern);
 }
 
-/** Signed amount string, e.g. "+$12.50" / "−$8.00", colored by sign/type. */
+/** Signed amount string, e.g. "+Rs 12.50" / "−Rs 8.00", colored by sign/type. */
 export function signedAmount(value: number, type: 'income' | 'expense' | 'auto' = 'auto'): string {
   const isIncome = type === 'auto' ? value >= 0 : type === 'income';
   const sign = isIncome ? '+' : '−';

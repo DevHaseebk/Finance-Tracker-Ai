@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { format } from 'date-fns';
 import { colors, radius, spacing, typography } from '../lib/theme';
+import { CURRENCY_SYMBOL } from '../lib/utils';
 import type { MonthlyTrendPoint } from '../types';
 
 interface TrendBarChartProps {
@@ -58,7 +59,7 @@ export default function TrendBarChart({ data }: TrendBarChartProps) {
         xAxisThickness={1}
         hideRules
         yAxisTextStyle={AXIS_LABEL_STYLE}
-        yAxisLabelPrefix="$"
+        yAxisLabelPrefix={`${CURRENCY_SYMBOL} `}
         height={160}
         initialSpacing={16}
         endSpacing={8}

@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
 import { format } from 'date-fns';
 import { colors } from '../lib/theme';
+import { CURRENCY_SYMBOL } from '../lib/utils';
 import type { SavingsTrendPoint } from '../types';
 
 interface SavingsLineChartProps {
@@ -42,7 +43,7 @@ export default function SavingsLineChart({ data }: SavingsLineChartProps) {
         hideRules
         noOfSections={4}
         yAxisTextStyle={AXIS_LABEL_STYLE}
-        yAxisLabelPrefix="$"
+        yAxisLabelPrefix={`${CURRENCY_SYMBOL} `}
         isAnimated
         animationDuration={450}
         initialSpacing={16}

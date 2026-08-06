@@ -32,7 +32,7 @@ import type { RecurringFrequency, RootStackParamList, TransactionType } from '..
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddTransaction'>;
 
-const MAX_AMOUNT_CENTS = 99_999_999; // $999,999.99
+const MAX_AMOUNT_CENTS = 99_999_999; // Rs 999,999.99
 
 export default function AddTransactionScreen({ navigation, route }: Props) {
   const transactionId = route.params?.transactionId;
