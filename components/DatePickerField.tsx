@@ -1,17 +1,20 @@
 import { useState } from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Calendar, Check } from 'lucide-react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Calendar } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { format, isToday, isYesterday, isSameDay } from 'date-fns';
-import DateTimePicker, {
-  DateTimePickerAndroid,
-} from '@react-native-community/datetimepicker';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, shadow, spacing, typography } from '../lib/theme';
+import NativeDateSheet from './NativeDateSheet';
+import { openAndroidDatePicker } from '../lib/nativeDatePicker';
+import { colors, radius, spacing, typography } from '../lib/theme';
 
 interface DatePickerFieldProps {
+  label?: string;
   value: Date;
   onChange: (date: Date) => void;
+  minimumDate?: Date;
+  /** Defaults to today — pass undefined to allow future dates too. */
+  maximumDate?: Date | undefined;
 }
 
 function yesterday(): Date {
@@ -25,7 +28,13 @@ function yesterday(): Date {
  * tap, and "Pick a date" opens the native calendar for anything else — most
  * entries never need to touch this component at all.
  */
-export default function DatePickerField({ value, onChange }: DatePickerFieldProps) {
+export default function DatePickerField({
+  label = 'DATE',
+  value,
+  onChange,
+  minimumDate,
+  maximumDate = new Date(),
+}: DatePickerFieldProps) {
   const [iosPickerOpen, setIosPickerOpen] = useState(false);
   const today = new Date();
   const yday = yesterday();
@@ -34,24 +43,17 @@ export default function DatePickerField({ value, onChange }: DatePickerFieldProp
   const openPicker = () => {
     Haptics.selectionAsync();
     if (Platform.OS === 'android') {
-      DateTimePickerAndroid.open({
-        value,
-        mode: 'date',
-        maximumDate: today,
-        onChange: (event, selected) => {
-          if (event.type === 'set' && selected) onChange(selected);
-        },
-      });
+      openAndroidDatePicker({ value, minimumDate, maximumDate, onChange });
     } else {
       // iOS renders the picker inline in a small modal below; on web the
-      // library's stub component is a no-op, so this is a native-only path.
+      // library's own platform fallback makes this a harmless no-op.
       setIosPickerOpen(true);
     }
   };
 
   return (
     <View>
-      <Text style={styles.label}>DATE</Text>
+      <Text style={styles.label}>{label}</Text>
       <View style={styles.row}>
         <Chip
           label="Today"
@@ -85,31 +87,14 @@ export default function DatePickerField({ value, onChange }: DatePickerFieldProp
       </View>
 
       {Platform.OS === 'ios' ? (
-        <Modal transparent animationType="fade" visible={iosPickerOpen}>
-          <Pressable style={styles.backdrop} onPress={() => setIosPickerOpen(false)}>
-            <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
-              <DateTimePicker
-                value={value}
-                mode="date"
-                display="inline"
-                maximumDate={today}
-                onChange={(_event, selected) => {
-                  if (selected) onChange(selected);
-                }}
-              />
-              <AnimatedPressable
-                onPress={() => setIosPickerOpen(false)}
-                haptic="light"
-                style={styles.doneButton}
-                accessibilityRole="button"
-                accessibilityLabel="Confirm date"
-              >
-                <Check size={18} strokeWidth={2.5} color={colors.textInverse} />
-                <Text style={styles.doneButtonText}>Done</Text>
-              </AnimatedPressable>
-            </Pressable>
-          </Pressable>
-        </Modal>
+        <NativeDateSheet
+          visible={iosPickerOpen}
+          value={value}
+          minimumDate={minimumDate}
+          maximumDate={maximumDate}
+          onChange={onChange}
+          onClose={() => setIosPickerOpen(false)}
+        />
       ) : null}
     </View>
   );
@@ -171,32 +156,5 @@ const styles = StyleSheet.create({
   chipTextSelected: {
     color: colors.textInverse,
     fontFamily: 'Inter_600SemiBold',
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: colors.overlay,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sheet: {
-    width: '88%',
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    ...shadow.lg,
-  },
-  doneButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    height: 48,
-    borderRadius: radius.md,
-    backgroundColor: colors.primary,
-    marginTop: spacing.md,
-  },
-  doneButtonText: {
-    ...typography.bodyMedium,
-    color: colors.textInverse,
   },
 });

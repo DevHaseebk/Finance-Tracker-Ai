@@ -35,6 +35,7 @@ interface RecentTransactionRow {
   note: string | null;
   date: string;
   created_at: string;
+  recurring_id: string | null;
   category: { name: string; icon: string | null; color: string | null } | null;
 }
 
@@ -48,6 +49,7 @@ function mapRecent(row: RecentTransactionRow): TransactionWithCategory {
     note: row.note ?? undefined,
     date: row.date,
     createdAt: row.created_at,
+    recurringId: row.recurring_id ?? undefined,
     categoryName: row.category?.name ?? 'Uncategorized',
     categoryIcon: row.category?.icon ?? undefined,
     categoryColor: row.category?.color ?? undefined,
@@ -82,7 +84,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       supabase
         .from('transactions')
         .select(
-          'id, user_id, category_id, type, amount, note, date, created_at, category:categories(name, icon, color)'
+          'id, user_id, category_id, type, amount, note, date, created_at, recurring_id, category:categories(name, icon, color)'
         )
         .order('date', { ascending: false })
         .order('created_at', { ascending: false })

@@ -27,6 +27,8 @@ import SettingsScreen from './SettingsScreen';
 import AddTransactionScreen from './AddTransactionScreen';
 import CategoriesScreen from './CategoriesScreen';
 import CategoryFormScreen from './CategoryFormScreen';
+import RecurringTransactionsScreen from './RecurringTransactionsScreen';
+import RecurringFormScreen from './RecurringFormScreen';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const AppStack = createNativeStackNavigator<RootStackParamList>();
@@ -136,6 +138,12 @@ function AppFlow() {
       <AppStack.Screen
         name="CategoryForm"
         component={CategoryFormScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <AppStack.Screen name="RecurringTransactions" component={RecurringTransactionsScreen} />
+      <AppStack.Screen
+        name="RecurringForm"
+        component={RecurringFormScreen}
         options={{ presentation: 'modal' }}
       />
     </AppStack.Navigator>

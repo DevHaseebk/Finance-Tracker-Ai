@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MotiView } from 'moti';
-import { LogOut, Mail, Tag, ChevronRight } from 'lucide-react-native';
+import { LogOut, Mail, Tag, Repeat, ChevronRight } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import AnimatedPressable from '../components/AnimatedPressable';
 import { useAuthStore } from '../store/authStore';
@@ -55,6 +55,25 @@ export default function SettingsScreen() {
               <Tag size={18} strokeWidth={2} color={colors.textSecondary} />
               <View style={styles.rowText}>
                 <Text style={styles.rowValue}>Categories</Text>
+              </View>
+              <ChevronRight size={18} strokeWidth={2} color={colors.textMuted} />
+            </View>
+          </AnimatedPressable>
+        </MotiView>
+
+        <MotiView {...motion.cardEntrance} delay={120}>
+          <AnimatedPressable
+            onPress={() => navigation.navigate('RecurringTransactions')}
+            haptic="light"
+            scaleTo={0.98}
+            style={styles.card}
+            accessibilityRole="button"
+            accessibilityLabel="Manage recurring transactions"
+          >
+            <View style={styles.row}>
+              <Repeat size={18} strokeWidth={2} color={colors.textSecondary} />
+              <View style={styles.rowText}>
+                <Text style={styles.rowValue}>Recurring Transactions</Text>
               </View>
               <ChevronRight size={18} strokeWidth={2} color={colors.textMuted} />
             </View>

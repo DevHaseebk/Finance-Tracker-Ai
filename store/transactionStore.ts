@@ -28,6 +28,7 @@ interface TransactionRow {
   note: string | null;
   date: string;
   created_at: string;
+  recurring_id: string | null;
 }
 
 function mapRow(row: TransactionRow): Transaction {
@@ -40,10 +41,12 @@ function mapRow(row: TransactionRow): Transaction {
     note: row.note ?? undefined,
     date: row.date,
     createdAt: row.created_at,
+    recurringId: row.recurring_id ?? undefined,
   };
 }
 
-const SELECT_COLUMNS = 'id, user_id, category_id, type, amount, note, date, created_at';
+const SELECT_COLUMNS =
+  'id, user_id, category_id, type, amount, note, date, created_at, recurring_id';
 
 interface TransactionState {
   transactions: Transaction[];

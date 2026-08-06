@@ -9,6 +9,8 @@ export interface Transaction {
   note?: string;
   date: string; // yyyy-MM-dd, matches the Postgres `date` column
   createdAt: string;
+  /** Set when this transaction was auto-generated from a recurring rule. */
+  recurringId?: string;
 }
 
 export interface Category {
@@ -39,6 +41,34 @@ export interface DashboardSummary {
   monthNet: number;
 }
 
+export type RecurringFrequency = 'daily' | 'weekly' | 'monthly';
+
+export interface RecurringTransaction {
+  id: string;
+  userId: string;
+  categoryId: string;
+  type: TransactionType;
+  amount: number;
+  note?: string;
+  frequency: RecurringFrequency;
+  /** Set only when frequency is 'monthly'; 1-31, clamped at generation time. */
+  dayOfMonth?: number;
+  /** Set only when frequency is 'weekly'; 0=Sunday..6=Saturday. */
+  dayOfWeek?: number;
+  startDate: string; // yyyy-MM-dd
+  endDate?: string; // yyyy-MM-dd
+  isActive: boolean;
+  lastGeneratedDate?: string;
+  createdAt: string;
+}
+
+/** A recurring rule with its category's display fields already joined in. */
+export interface RecurringTransactionWithCategory extends RecurringTransaction {
+  categoryName: string;
+  categoryIcon?: string;
+  categoryColor?: string;
+}
+
 /** Screens shown while logged out. */
 export type AuthStackParamList = {
   Welcome: undefined;
@@ -51,11 +81,18 @@ export type RootStackParamList = {
   Tabs: undefined;
   /** Presented modally over the tabs from the floating action button. Omit
    * transactionId to create; pass it to edit an existing transaction.
-   * initialType only applies when creating (ignored once transactionId is set). */
-  AddTransaction: { transactionId?: string; initialType?: TransactionType } | undefined;
+   * initialType/initialRecurring only apply when creating (ignored once
+   * transactionId is set). */
+  AddTransaction:
+    | { transactionId?: string; initialType?: TransactionType; initialRecurring?: boolean }
+    | undefined;
   Categories: undefined;
   /** Omit categoryId to create; pass it to edit an existing custom category. */
   CategoryForm: { categoryId?: string } | undefined;
+  RecurringTransactions: undefined;
+  /** Editing an existing recurring rule; there is no create route here — new
+   * rules are always created via AddTransaction's recurring toggle. */
+  RecurringForm: { recurringId: string };
   TransactionDetail: { id: string };
 };
 

@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
-import { X, AlertCircle, Repeat } from 'lucide-react-native';
+import { X, AlertCircle, Trash2 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Toast from 'react-native-toast-message';
 import { format } from 'date-fns';
@@ -24,92 +24,78 @@ import CategoryChipList from '../components/CategoryChipList';
 import DatePickerField from '../components/DatePickerField';
 import RecurrenceFields from '../components/RecurrenceFields';
 import { useCategoryStore } from '../store/categoryStore';
-import { useTransactionStore } from '../store/transactionStore';
 import { useRecurringStore } from '../store/recurringStore';
 import { formatCurrency } from '../lib/utils';
-import { colors, motion, radius, shadow, spacing, typography } from '../lib/theme';
+import { colors, motion, radius, spacing, typography } from '../lib/theme';
 import type { RecurringFrequency, RootStackParamList, TransactionType } from '../types';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'AddTransaction'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'RecurringForm'>;
 
 const MAX_AMOUNT_CENTS = 99_999_999; // $999,999.99
 
-export default function AddTransactionScreen({ navigation, route }: Props) {
-  const transactionId = route.params?.transactionId;
-  const isEditing = !!transactionId;
+export default function RecurringFormScreen({ navigation, route }: Props) {
+  const { recurringId } = route.params;
 
   const categories = useCategoryStore((s) => s.categories);
   const fetchCategories = useCategoryStore((s) => s.fetchCategories);
-  const fetchTransactionById = useTransactionStore((s) => s.fetchTransactionById);
-  const addTransaction = useTransactionStore((s) => s.addTransaction);
-  const updateTransaction = useTransactionStore((s) => s.updateTransaction);
-  const isMutatingTransaction = useTransactionStore((s) => s.isMutating);
-  const addRule = useRecurringStore((s) => s.addRule);
-  const isMutatingRule = useRecurringStore((s) => s.isMutating);
-  const isMutating = isMutatingTransaction || isMutatingRule;
+  const fetchRuleById = useRecurringStore((s) => s.fetchRuleById);
+  const updateRule = useRecurringStore((s) => s.updateRule);
+  const deleteRule = useRecurringStore((s) => s.deleteRule);
+  const isMutating = useRecurringStore((s) => s.isMutating);
 
-  const [isLoading, setIsLoading] = useState(isEditing);
+  const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const [type, setType] = useState<TransactionType>(route.params?.initialType ?? 'expense');
+  const [type, setType] = useState<TransactionType>('expense');
   const [amountCents, setAmountCents] = useState(0);
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [date, setDate] = useState<Date>(new Date());
   const [note, setNote] = useState('');
-
-  // Recurring-only fields. Day defaults come from "today" rather than the
-  // start date field, so flipping the toggle without touching anything else
-  // already lands on a sensible, editable default.
-  const [isRecurring, setIsRecurring] = useState(route.params?.initialRecurring ?? false);
+  const [startDate, setStartDate] = useState<Date>(new Date());
   const [frequency, setFrequency] = useState<RecurringFrequency>('daily');
   const [dayOfWeek, setDayOfWeek] = useState(() => new Date().getDay());
   const [dayOfMonth, setDayOfMonth] = useState(() => new Date().getDate());
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  // Categories may not be loaded yet if this modal is opened before the
-  // Categories screen ever was, so always fetch fresh here.
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
   useEffect(() => {
-    if (!isEditing || !transactionId) return;
-
     let cancelled = false;
     (async () => {
-      const result = await fetchTransactionById(transactionId);
+      const result = await fetchRuleById(recurringId);
       if (cancelled) return;
 
       if (result.error || !result.data) {
-        setLoadError(result.error ?? 'Transaction not found.');
+        setLoadError(result.error ?? 'Recurring transaction not found.');
         setIsLoading(false);
         return;
       }
 
-      const tx = result.data;
-      setType(tx.type);
-      setAmountCents(Math.round(tx.amount * 100));
-      setCategoryId(tx.categoryId);
-      setDate(new Date(`${tx.date}T00:00:00`));
-      setNote(tx.note ?? '');
+      const rule = result.data;
+      setType(rule.type);
+      setAmountCents(Math.round(rule.amount * 100));
+      setCategoryId(rule.categoryId);
+      setNote(rule.note ?? '');
+      setStartDate(new Date(`${rule.startDate}T00:00:00`));
+      setFrequency(rule.frequency);
+      if (rule.dayOfWeek != null) setDayOfWeek(rule.dayOfWeek);
+      if (rule.dayOfMonth != null) setDayOfMonth(rule.dayOfMonth);
+      setEndDate(rule.endDate ? new Date(`${rule.endDate}T00:00:00`) : null);
       setIsLoading(false);
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [isEditing, transactionId, fetchTransactionById]);
+  }, [recurringId, fetchRuleById]);
 
   const filteredCategories = useMemo(
     () => categories.filter((c) => c.type === type && !c.isHidden),
     [categories, type]
   );
 
-  // Auto-select the first available category whenever the current selection
-  // doesn't belong to the active type — covers the initial load and every
-  // type toggle. This is what makes the flow completable in a couple of taps:
-  // type, amount, save, with a sensible category already chosen.
   useEffect(() => {
     if (isLoading) return;
     const stillValid = filteredCategories.some((c) => c.id === categoryId);
@@ -144,42 +130,17 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
       return;
     }
 
-    if (isRecurring && !isEditing) {
-      const result = await addRule({
-        type,
-        amount: amountCents / 100,
-        categoryId,
-        note,
-        frequency,
-        dayOfWeek: frequency === 'weekly' ? dayOfWeek : null,
-        dayOfMonth: frequency === 'monthly' ? dayOfMonth : null,
-        startDate: format(date, 'yyyy-MM-dd'),
-        endDate: endDate ? format(endDate, 'yyyy-MM-dd') : null,
-      });
-
-      if (result.error) {
-        setFormError(result.error);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        return;
-      }
-
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Toast.show({ type: 'success', text1: 'Recurring transaction added' });
-      navigation.goBack();
-      return;
-    }
-
-    const input = {
+    const result = await updateRule(recurringId, {
       type,
       amount: amountCents / 100,
       categoryId,
       note,
-      date: format(date, 'yyyy-MM-dd'),
-    };
-
-    const result = isEditing
-      ? await updateTransaction(transactionId!, input)
-      : await addTransaction(input);
+      frequency,
+      dayOfWeek: frequency === 'weekly' ? dayOfWeek : null,
+      dayOfMonth: frequency === 'monthly' ? dayOfMonth : null,
+      startDate: format(startDate, 'yyyy-MM-dd'),
+      endDate: endDate ? format(endDate, 'yyyy-MM-dd') : null,
+    });
 
     if (result.error) {
       setFormError(result.error);
@@ -188,26 +149,42 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
     }
 
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Toast.show({
-      type: 'success',
-      text1: isEditing ? 'Transaction updated' : 'Transaction added',
-    });
+    Toast.show({ type: 'success', text1: 'Recurring transaction updated' });
     navigation.goBack();
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete recurring transaction?',
+      "This stops future transactions from being generated. Transactions already created won't be affected.",
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await deleteRule(recurringId);
+            if (result.error) {
+              Toast.show({ type: 'error', text1: 'Could not delete', text2: result.error });
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+              return;
+            }
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            Toast.show({ type: 'success', text1: 'Recurring transaction deleted' });
+            navigation.goBack();
+          },
+        },
+      ]
+    );
   };
 
   const amountColor = type === 'income' ? colors.success : colors.danger;
   const amountSign = type === 'income' ? '+' : '−';
 
-  const saveLabel = isEditing
-    ? 'Save Changes'
-    : isRecurring
-      ? 'Add Recurring Transaction'
-      : 'Add Transaction';
-
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <Text style={styles.title}>{isEditing ? 'Edit Transaction' : 'Add Transaction'}</Text>
+        <Text style={styles.title}>Edit Recurring</Text>
         <AnimatedPressable
           onPress={() => navigation.goBack()}
           haptic="light"
@@ -270,62 +247,26 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
 
             <View style={styles.section}>
               <DatePickerField
-                label={isRecurring && !isEditing ? 'START DATE' : 'DATE'}
-                value={date}
-                onChange={setDate}
-                // A recurring rule can start in the future; a one-off
-                // transaction can't be dated after today.
-                maximumDate={isRecurring && !isEditing ? undefined : new Date()}
+                label="START DATE"
+                value={startDate}
+                onChange={setStartDate}
+                maximumDate={undefined}
               />
             </View>
 
-            {!isEditing ? (
-              <MotiView {...motion.cardEntrance} style={styles.section}>
-                <AnimatedPressable
-                  onPress={() => {
-                    Haptics.selectionAsync();
-                    setIsRecurring((v) => !v);
-                  }}
-                  haptic="none"
-                  scaleTo={0.99}
-                  style={styles.recurringRow}
-                  accessibilityRole="switch"
-                  accessibilityState={{ checked: isRecurring }}
-                  accessibilityLabel="Make this a recurring transaction"
-                >
-                  <Repeat size={18} strokeWidth={2} color={colors.textSecondary} />
-                  <Text style={styles.recurringLabel}>Repeat this transaction</Text>
-                  <Switch
-                    value={isRecurring}
-                    onValueChange={(v) => {
-                      Haptics.selectionAsync();
-                      setIsRecurring(v);
-                    }}
-                    trackColor={{ false: colors.border, true: colors.primaryLight }}
-                    thumbColor={isRecurring ? colors.primary : colors.textMuted}
-                  />
-                </AnimatedPressable>
-
-                {isRecurring ? (
-                  <MotiView
-                    {...motion.fadeIn}
-                    style={styles.recurrenceFieldsWrapper}
-                  >
-                    <RecurrenceFields
-                      frequency={frequency}
-                      onFrequencyChange={setFrequency}
-                      dayOfWeek={dayOfWeek}
-                      onDayOfWeekChange={setDayOfWeek}
-                      dayOfMonth={dayOfMonth}
-                      onDayOfMonthChange={setDayOfMonth}
-                      endDate={endDate}
-                      onEndDateChange={setEndDate}
-                      startDate={date}
-                    />
-                  </MotiView>
-                ) : null}
-              </MotiView>
-            ) : null}
+            <View style={styles.section}>
+              <RecurrenceFields
+                frequency={frequency}
+                onFrequencyChange={setFrequency}
+                dayOfWeek={dayOfWeek}
+                onDayOfWeekChange={setDayOfWeek}
+                dayOfMonth={dayOfMonth}
+                onDayOfMonthChange={setDayOfMonth}
+                endDate={endDate}
+                onEndDateChange={setEndDate}
+                startDate={startDate}
+              />
+            </View>
 
             <View style={styles.section}>
               <TextField
@@ -338,6 +279,18 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
                 editable={!isMutating}
               />
             </View>
+
+            <AnimatedPressable
+              onPress={handleDelete}
+              disabled={isMutating}
+              haptic="medium"
+              style={styles.deleteButton}
+              accessibilityRole="button"
+              accessibilityLabel="Delete recurring transaction"
+            >
+              <Trash2 size={18} strokeWidth={2} color={colors.danger} />
+              <Text style={styles.deleteButtonText}>Delete Recurring Transaction</Text>
+            </AnimatedPressable>
           </ScrollView>
 
           <View style={styles.footer}>
@@ -347,12 +300,12 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
               haptic="medium"
               style={[styles.saveButton, isMutating && styles.saveButtonDisabled]}
               accessibilityRole="button"
-              accessibilityLabel={saveLabel}
+              accessibilityLabel="Save changes"
             >
               {isMutating ? (
                 <ActivityIndicator color={colors.textInverse} />
               ) : (
-                <Text style={styles.saveButtonText}>{saveLabel}</Text>
+                <Text style={styles.saveButtonText}>Save Changes</Text>
               )}
             </AnimatedPressable>
 
@@ -400,6 +353,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
   },
   banner: {
     flexDirection: 'row',
@@ -432,26 +386,18 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
-  recurringRow: {
+  deleteButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.card,
+    height: 52,
     borderRadius: radius.md,
-    padding: spacing.md,
-    ...shadow.sm,
-  },
-  recurringLabel: {
-    ...typography.bodyMedium,
-    color: colors.text,
-    flex: 1,
-  },
-  recurrenceFieldsWrapper: {
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    padding: spacing.md,
     marginTop: spacing.sm,
-    ...shadow.sm,
+  },
+  deleteButtonText: {
+    ...typography.bodyMedium,
+    color: colors.danger,
   },
   footer: {
     paddingHorizontal: spacing.lg,

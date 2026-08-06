@@ -14,19 +14,12 @@ import {
   Receipt,
 } from 'lucide-react-native';
 import AnimatedPressable from '../components/AnimatedPressable';
+import TransactionListItem from '../components/TransactionListItem';
 import { useDashboardStore } from '../store/dashboardStore';
-import { getCategoryIcon } from '../lib/categoryIcons';
-import { formatCurrency, formatDate } from '../lib/utils';
+import { formatCurrency, signedAmount } from '../lib/utils';
 import { colors, motion, radius, shadow, spacing, staggerDelay, typography } from '../lib/theme';
 import { FAB_CLEARANCE } from '../components/FloatingActionButton';
-import type { RootStackParamList, TransactionWithCategory } from '../types';
-
-/** Signed amount string, e.g. "+$12.50" / "−$8.00", colored by sign/type. */
-function signedAmount(value: number, type: 'income' | 'expense' | 'auto' = 'auto') {
-  const isIncome = type === 'auto' ? value >= 0 : type === 'income';
-  const sign = isIncome ? '+' : '−';
-  return `${sign}${formatCurrency(Math.abs(value))}`;
-}
+import type { RootStackParamList } from '../types';
 
 export default function DashboardScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -172,7 +165,7 @@ export default function DashboardScreen() {
               ) : (
                 <View style={styles.list}>
                   {recentTransactions.map((tx, index) => (
-                    <TransactionRow key={tx.id} transaction={tx} index={index} />
+                    <TransactionListItem key={tx.id} transaction={tx} index={index} />
                   ))}
                 </View>
               )}
@@ -181,40 +174,6 @@ export default function DashboardScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function TransactionRow({
-  transaction,
-  index,
-}: {
-  transaction: TransactionWithCategory;
-  index: number;
-}) {
-  const Icon = getCategoryIcon(transaction.categoryIcon);
-  const tint = transaction.categoryColor ?? colors.primary;
-
-  return (
-    <MotiView {...motion.cardEntrance} delay={staggerDelay(index, 30)} style={styles.row}>
-      <View style={[styles.rowSwatch, { backgroundColor: tint }]}>
-        <Icon size={16} strokeWidth={2} color={colors.textInverse} />
-      </View>
-      <View style={styles.rowText}>
-        <Text style={styles.rowName} numberOfLines={1}>
-          {transaction.categoryName}
-        </Text>
-        <Text style={styles.rowDate}>{formatDate(transaction.date, 'MMM d')}</Text>
-      </View>
-      <Text
-        style={[
-          styles.rowAmount,
-          { color: transaction.type === 'income' ? colors.success : colors.danger },
-        ]}
-        numberOfLines={1}
-      >
-        {signedAmount(transaction.amount, transaction.type)}
-      </Text>
-    </MotiView>
   );
 }
 
@@ -325,36 +284,6 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: spacing.sm,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    ...shadow.sm,
-  },
-  rowSwatch: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rowText: { flex: 1 },
-  rowName: {
-    ...typography.bodyMedium,
-    color: colors.text,
-  },
-  rowDate: {
-    ...typography.label,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  rowAmount: {
-    ...typography.bodyMedium,
-    fontFamily: 'Inter_600SemiBold',
   },
   emptyState: {
     alignItems: 'center',
