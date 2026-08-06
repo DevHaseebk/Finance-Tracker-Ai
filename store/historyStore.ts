@@ -4,7 +4,7 @@ import type { TransactionWithCategory } from '../types';
 
 const PAGE_SIZE = 30;
 
-interface HistoryRow {
+interface SearchRow {
   id: string;
   user_id: string;
   category_id: string;
@@ -14,10 +14,12 @@ interface HistoryRow {
   date: string;
   created_at: string;
   recurring_id: string | null;
-  category: { name: string; icon: string | null; color: string | null } | null;
+  category_name: string;
+  category_icon: string | null;
+  category_color: string | null;
 }
 
-function mapRow(row: HistoryRow): TransactionWithCategory {
+function mapRow(row: SearchRow): TransactionWithCategory {
   return {
     id: row.id,
     userId: row.user_id,
@@ -28,86 +30,125 @@ function mapRow(row: HistoryRow): TransactionWithCategory {
     date: row.date,
     createdAt: row.created_at,
     recurringId: row.recurring_id ?? undefined,
-    categoryName: row.category?.name ?? 'Uncategorized',
-    categoryIcon: row.category?.icon ?? undefined,
-    categoryColor: row.category?.color ?? undefined,
+    categoryName: row.category_name,
+    categoryIcon: row.category_icon ?? undefined,
+    categoryColor: row.category_color ?? undefined,
   };
 }
 
-const SELECT_COLUMNS =
-  'id, user_id, category_id, type, amount, note, date, created_at, recurring_id, category:categories(name, icon, color)';
+export interface HistoryFilters {
+  year: number | null;
+  /** 1-12 */
+  month: number | null;
+  categoryId: string | null;
+  search: string;
+}
+
+const DEFAULT_FILTERS: HistoryFilters = {
+  year: null,
+  month: null,
+  categoryId: null,
+  search: '',
+};
 
 interface HistoryState {
   transactions: TransactionWithCategory[];
+  filters: HistoryFilters;
   isLoading: boolean;
   isLoadingMore: boolean;
   hasMore: boolean;
   error: string | null;
 
-  /** Resets to the first page — call on mount and whenever the screen refocuses. */
+  /** Merges into the current filters and refetches from page one. */
+  setFilters: (patch: Partial<HistoryFilters>) => void;
+  /** Resets to the first page with the current filters — call on mount and
+   * whenever the screen refocuses. */
   fetchFirstPage: () => Promise<void>;
   /** Appends the next page; no-ops while already loading or once exhausted. */
   fetchNextPage: () => Promise<void>;
 }
 
-// A page-at-a-time list, never the full table: each request is capped at
-// PAGE_SIZE rows via .range(), so history can grow indefinitely without the
-// client ever holding more than what's been scrolled into view.
+// Every fetch — first page or next page, with or without filters — goes
+// through search_transactions(), which does the filtering, sorting and
+// LIMIT/OFFSET pagination in SQL. The client never holds more than the pages
+// that have actually been scrolled into view.
+//
+// requestId guards against races: typing in the search box or flipping a
+// filter can fire a fetch before the previous one resolves. Only the response
+// matching the most recently issued request is applied; anything older is
+// dropped so a slow, stale response can't clobber newer results.
+let requestId = 0;
+
 export const useHistoryStore = create<HistoryState>((set, get) => ({
   transactions: [],
+  filters: DEFAULT_FILTERS,
   isLoading: false,
   isLoadingMore: false,
   hasMore: true,
   error: null,
 
+  setFilters: (patch) => {
+    set((state) => ({ filters: { ...state.filters, ...patch } }));
+    get().fetchFirstPage();
+  },
+
   fetchFirstPage: async () => {
+    const myRequestId = ++requestId;
     set({ isLoading: true, error: null });
 
-    const { data, error } = await supabase
-      .from('transactions')
-      .select(SELECT_COLUMNS)
-      .order('date', { ascending: false })
-      .order('created_at', { ascending: false })
-      .range(0, PAGE_SIZE - 1)
-      .returns<HistoryRow[]>();
+    const { filters } = get();
+    const { data, error } = await supabase.rpc('search_transactions', {
+      p_year: filters.year,
+      p_month: filters.month,
+      p_category_id: filters.categoryId,
+      p_search: filters.search.trim() || null,
+      p_limit: PAGE_SIZE,
+      p_offset: 0,
+    });
+
+    if (myRequestId !== requestId) return;
 
     if (error) {
       set({ isLoading: false, error: error.message });
       return;
     }
 
+    const rows = (data ?? []) as SearchRow[];
     set({
-      transactions: (data ?? []).map(mapRow),
+      transactions: rows.map(mapRow),
       isLoading: false,
-      hasMore: (data?.length ?? 0) === PAGE_SIZE,
+      hasMore: rows.length === PAGE_SIZE,
     });
   },
 
   fetchNextPage: async () => {
-    const { transactions, isLoadingMore, hasMore, isLoading } = get();
+    const { transactions, isLoadingMore, hasMore, isLoading, filters } = get();
     if (isLoadingMore || isLoading || !hasMore) return;
 
+    const myRequestId = ++requestId;
     set({ isLoadingMore: true });
 
-    const from = transactions.length;
-    const to = from + PAGE_SIZE - 1;
-    const { data, error } = await supabase
-      .from('transactions')
-      .select(SELECT_COLUMNS)
-      .order('date', { ascending: false })
-      .order('created_at', { ascending: false })
-      .range(from, to)
-      .returns<HistoryRow[]>();
+    const { data, error } = await supabase.rpc('search_transactions', {
+      p_year: filters.year,
+      p_month: filters.month,
+      p_category_id: filters.categoryId,
+      p_search: filters.search.trim() || null,
+      p_limit: PAGE_SIZE,
+      p_offset: transactions.length,
+    });
+
+    if (myRequestId !== requestId) return;
 
     if (error) {
       set({ isLoadingMore: false, error: error.message });
       return;
     }
 
+    const rows = (data ?? []) as SearchRow[];
     set((state) => ({
-      transactions: [...state.transactions, ...(data ?? []).map(mapRow)],
+      transactions: [...state.transactions, ...rows.map(mapRow)],
       isLoadingMore: false,
-      hasMore: (data?.length ?? 0) === PAGE_SIZE,
+      hasMore: rows.length === PAGE_SIZE,
     }));
   },
 }));
