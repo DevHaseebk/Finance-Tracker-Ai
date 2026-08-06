@@ -2,7 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface MonthYearFilterProps {
   /** Both null means "All Time". */
@@ -32,6 +33,8 @@ const MONTH_ABBR = [
  * back to unfiltered.
  */
 export default function MonthYearFilter({ year, month, onChange }: MonthYearFilterProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const isAllTime = year === null && month === null;
 
   const today = new Date();
@@ -113,7 +116,7 @@ export default function MonthYearFilter({ year, month, onChange }: MonthYearFilt
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',

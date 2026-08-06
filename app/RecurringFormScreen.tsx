@@ -26,7 +26,8 @@ import RecurrenceFields from '../components/RecurrenceFields';
 import { useCategoryStore } from '../store/categoryStore';
 import { useRecurringStore } from '../store/recurringStore';
 import { formatCurrency } from '../lib/utils';
-import { colors, fontSize, motion, radius, spacing, typography } from '../lib/theme';
+import { fontSize, motion, radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { RecurringFrequency, RootStackParamList, TransactionType } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecurringForm'>;
@@ -34,6 +35,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'RecurringForm'>;
 const MAX_AMOUNT_CENTS = 99_999_999; // Rs 999,999.99
 
 export default function RecurringFormScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const { recurringId } = route.params;
 
   const categories = useCategoryStore((s) => s.categories);
@@ -318,7 +321,7 @@ export default function RecurringFormScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
   header: {

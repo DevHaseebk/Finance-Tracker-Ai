@@ -1,10 +1,12 @@
 import { StyleSheet, View } from 'react-native';
 import Skeleton from './Skeleton';
-import { colors, radius, shadow, spacing } from '../lib/theme';
+import { radius, shadow, spacing, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 
 /** Mirrors AnalyticsScreen's real card layout — range chips, breakdown donut
  * + legend, top spending rows, two chart cards. */
 export default function AnalyticsSkeleton() {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       <View style={styles.rangeRow}>
@@ -58,7 +60,7 @@ export default function AnalyticsSkeleton() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   rangeRow: {
     flexDirection: 'row',
     gap: spacing.sm,

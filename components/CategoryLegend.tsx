@@ -3,7 +3,8 @@ import { MotiView } from 'moti';
 import { CATEGORY_COLORS } from '../lib/categoryColors';
 import { getCategoryIcon } from '../lib/categoryIcons';
 import { formatCurrency } from '../lib/utils';
-import { colors, motion, radius, spacing, staggerDelay, typography } from '../lib/theme';
+import { motion, radius, spacing, staggerDelay, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { CategoryBreakdownItem } from '../types';
 
 interface CategoryLegendProps {
@@ -11,6 +12,8 @@ interface CategoryLegendProps {
 }
 
 export default function CategoryLegend({ data }: CategoryLegendProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.list}>
       {data.map((item, index) => {
@@ -41,7 +44,7 @@ export default function CategoryLegend({ data }: CategoryLegendProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   list: {
     gap: spacing.sm,
   },

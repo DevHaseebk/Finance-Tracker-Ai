@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import Skeleton from './Skeleton';
-import { colors, radius, shadow, spacing } from '../lib/theme';
+import { radius, shadow, spacing, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 
 interface HistorySkeletonProps {
   /** HistoryScreen's filter row is already rendered live above this
@@ -12,6 +13,7 @@ interface HistorySkeletonProps {
 /** Mirrors HistoryScreen's real layout — filter row, section label, a run of
  * transaction rows — shown while the first page is loading. */
 export default function HistorySkeleton({ showFilters = false }: HistorySkeletonProps) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       {showFilters && (
@@ -47,7 +49,7 @@ export default function HistorySkeleton({ showFilters = false }: HistorySkeleton
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   filterRow: {
     flexDirection: 'row',
     alignItems: 'center',

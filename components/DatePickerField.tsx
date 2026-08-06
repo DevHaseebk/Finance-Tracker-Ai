@@ -6,7 +6,8 @@ import { format, isToday, isYesterday, isSameDay } from 'date-fns';
 import AnimatedPressable from './AnimatedPressable';
 import NativeDateSheet from './NativeDateSheet';
 import { openAndroidDatePicker } from '../lib/nativeDatePicker';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface DatePickerFieldProps {
   label?: string;
@@ -35,6 +36,8 @@ export default function DatePickerField({
   minimumDate,
   maximumDate = new Date(),
 }: DatePickerFieldProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [iosPickerOpen, setIosPickerOpen] = useState(false);
   const today = new Date();
   const yday = yesterday();
@@ -109,6 +112,7 @@ function Chip({
   selected: boolean;
   onPress: () => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <AnimatedPressable
       onPress={onPress}
@@ -124,7 +128,7 @@ function Chip({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,

@@ -1,6 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  useNavigation,
+  DarkTheme,
+  DefaultTheme,
+  type Theme as NavTheme,
+} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   createNativeStackNavigator,
@@ -14,7 +20,8 @@ import {
   Settings as SettingsIcon,
 } from 'lucide-react-native';
 import type { AuthStackParamList, RootStackParamList, TabParamList } from '../types';
-import { colors, fontSize, spacing } from '../lib/theme';
+import { fontSize, spacing, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import { useAuthStore } from '../store/authStore';
 import FloatingActionButton from '../components/FloatingActionButton';
 import WelcomeScreen from './WelcomeScreen';
@@ -35,6 +42,7 @@ const AppStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
 function Tabs() {
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -105,6 +113,7 @@ function Tabs() {
  * re-mounting and re-animating every time.
  */
 function TabsWithFab() {
+  const styles = useThemedStyles(makeStyles);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
@@ -151,12 +160,31 @@ function AppFlow() {
 }
 
 export default function RootNavigation() {
+  const { colors, isDark } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const session = useAuthStore((s) => s.session);
   const isInitializing = useAuthStore((s) => s.isInitializing);
   const initialize = useAuthStore((s) => s.initialize);
 
   // Restore the persisted session and subscribe to auth changes once.
   useEffect(() => initialize(), [initialize]);
+
+  // Without this the navigator keeps its own default surface colours and
+  // flashes white behind every screen transition in dark mode.
+  const navTheme = useMemo<NavTheme>(() => {
+    const base = isDark ? DarkTheme : DefaultTheme;
+    return {
+      ...base,
+      colors: {
+        ...base.colors,
+        primary: colors.primary,
+        background: colors.background,
+        card: colors.card,
+        text: colors.text,
+        border: colors.border,
+      },
+    };
+  }, [isDark, colors]);
 
   // Hold on a neutral screen until we know whether a session exists, otherwise
   // returning users get a flash of the login screen on every cold start.
@@ -169,11 +197,13 @@ export default function RootNavigation() {
   }
 
   return (
-    <NavigationContainer>{session ? <AppFlow /> : <AuthFlow />}</NavigationContainer>
+    <NavigationContainer theme={navTheme}>
+      {session ? <AppFlow /> : <AuthFlow />}
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   flex: { flex: 1 },
   loading: {
     flex: 1,

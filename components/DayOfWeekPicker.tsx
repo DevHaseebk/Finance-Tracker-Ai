@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 
 interface DayOfWeekPickerProps {
   /** 0=Sunday..6=Saturday, matching Postgres extract(dow from date). */
@@ -12,6 +13,7 @@ interface DayOfWeekPickerProps {
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 export default function DayOfWeekPicker({ value, onChange }: DayOfWeekPickerProps) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       <Text style={styles.label}>REPEATS ON</Text>
@@ -46,7 +48,7 @@ export default function DayOfWeekPicker({ value, onChange }: DayOfWeekPickerProp
 
 const CELL_SIZE = 40;
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,

@@ -2,7 +2,8 @@ import { ScrollView, StyleSheet, Text } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
 import { getCategoryIcon } from '../lib/categoryIcons';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { Category } from '../types';
 
 interface CategoryFilterChipsProps {
@@ -23,6 +24,8 @@ export default function CategoryFilterChips({
   selectedId,
   onSelect,
 }: CategoryFilterChipsProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <ScrollView
       horizontal
@@ -79,7 +82,7 @@ export default function CategoryFilterChips({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   row: {
     gap: spacing.sm,
     paddingRight: spacing.lg,

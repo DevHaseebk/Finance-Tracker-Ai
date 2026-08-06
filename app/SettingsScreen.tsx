@@ -3,15 +3,37 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MotiView } from 'moti';
-import { LogOut, Mail, Tag, Repeat, ChevronRight } from 'lucide-react-native';
+import {
+  LogOut,
+  Mail,
+  Tag,
+  Repeat,
+  ChevronRight,
+  Monitor,
+  Sun,
+  Moon,
+} from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 import Toast from 'react-native-toast-message';
 import AnimatedPressable from '../components/AnimatedPressable';
 import { useAuthStore } from '../store/authStore';
-import { colors, motion, radius, shadow, spacing, typography } from '../lib/theme';
+import { useThemeStore, type ThemeMode } from '../store/themeStore';
+import { motion, radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import { FAB_CLEARANCE } from '../components/FloatingActionButton';
 import type { RootStackParamList } from '../types';
 
+const THEME_OPTIONS: { value: ThemeMode; label: string; icon: typeof Monitor }[] = [
+  { value: 'system', label: 'System', icon: Monitor },
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'dark', label: 'Dark', icon: Moon },
+];
+
 export default function SettingsScreen() {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
+  const themeMode = useThemeStore((s) => s.mode);
+  const setThemeMode = useThemeStore((s) => s.setMode);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
@@ -39,6 +61,45 @@ export default function SettingsScreen() {
                 {user?.email ?? '—'}
               </Text>
             </View>
+          </View>
+        </MotiView>
+
+        <MotiView {...motion.cardEntrance} delay={40} style={styles.card}>
+          <Text style={styles.sectionLabel}>APPEARANCE</Text>
+          <View style={styles.themeTrack}>
+            {THEME_OPTIONS.map((option) => {
+              const selected = option.value === themeMode;
+              const Icon = option.icon;
+              return (
+                <AnimatedPressable
+                  key={option.value}
+                  onPress={() => {
+                    if (selected) return;
+                    Haptics.selectionAsync();
+                    setThemeMode(option.value);
+                  }}
+                  haptic="none"
+                  scaleTo={0.96}
+                  style={styles.themeSegmentWrapper}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  accessibilityLabel={`${option.label} theme`}
+                >
+                  <View style={[styles.themeSegment, selected && styles.themeSegmentSelected]}>
+                    <Icon
+                      size={16}
+                      strokeWidth={2}
+                      color={selected ? colors.textInverse : colors.textSecondary}
+                    />
+                    <Text
+                      style={[styles.themeLabel, selected && styles.themeLabelSelected]}
+                    >
+                      {option.label}
+                    </Text>
+                  </View>
+                </AnimatedPressable>
+              );
+            })}
           </View>
         </MotiView>
 
@@ -102,7 +163,7 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   container: {
     flex: 1,
@@ -125,6 +186,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  sectionLabel: {
+    ...typography.label,
+    color: colors.textMuted,
+    marginBottom: spacing.md,
+  },
+  themeTrack: {
+    flexDirection: 'row',
+    backgroundColor: colors.background,
+    borderRadius: radius.md,
+    padding: spacing.xs,
+    gap: spacing.xs,
+  },
+  themeSegmentWrapper: { flex: 1 },
+  themeSegment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    height: 40,
+    borderRadius: radius.sm,
+  },
+  themeSegmentSelected: {
+    backgroundColor: colors.primary,
+  },
+  themeLabel: {
+    ...typography.caption,
+    color: colors.textSecondary,
+  },
+  themeLabelSelected: {
+    color: colors.textInverse,
+    fontFamily: 'Inter_600SemiBold',
   },
   rowText: { flex: 1 },
   rowLabel: {

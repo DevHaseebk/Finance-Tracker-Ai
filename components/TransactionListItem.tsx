@@ -3,7 +3,8 @@ import { MotiView } from 'moti';
 import { Repeat } from 'lucide-react-native';
 import { getCategoryIcon } from '../lib/categoryIcons';
 import { formatDate, signedAmount } from '../lib/utils';
-import { colors, motion, radius, shadow, spacing, staggerDelay, typography } from '../lib/theme';
+import { motion, radius, shadow, spacing, staggerDelay, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { TransactionWithCategory } from '../types';
 
 interface TransactionListItemProps {
@@ -16,6 +17,8 @@ interface TransactionListItemProps {
  * Shows a small repeat icon next to the name when the transaction was
  * auto-generated from a recurring rule (transaction.recurringId is set). */
 export default function TransactionListItem({ transaction, index = 0 }: TransactionListItemProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const Icon = getCategoryIcon(transaction.categoryIcon);
   const tint = transaction.categoryColor ?? colors.primary;
 
@@ -55,7 +58,7 @@ export default function TransactionListItem({ transaction, index = 0 }: Transact
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',

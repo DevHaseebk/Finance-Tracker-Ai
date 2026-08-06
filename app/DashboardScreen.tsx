@@ -18,20 +18,14 @@ import TransactionListItem from '../components/TransactionListItem';
 import DashboardSkeleton from '../components/DashboardSkeleton';
 import { useDashboardStore } from '../store/dashboardStore';
 import { formatCurrency, signedAmount } from '../lib/utils';
-import {
-  colors,
-  fontSize,
-  motion,
-  radius,
-  shadow,
-  spacing,
-  staggerDelay,
-  typography,
-} from '../lib/theme';
+import { fontSize, motion, radius, shadow, spacing, staggerDelay, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import { FAB_CLEARANCE } from '../components/FloatingActionButton';
 import type { RootStackParamList } from '../types';
 
 export default function DashboardScreen() {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const summary = useDashboardStore((s) => s.summary);
   const recentTransactions = useDashboardStore((s) => s.recentTransactions);
@@ -204,7 +198,7 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   content: {
     padding: spacing.lg,

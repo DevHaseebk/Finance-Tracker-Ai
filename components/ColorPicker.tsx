@@ -3,7 +3,8 @@ import { Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
 import { CATEGORY_COLORS } from '../lib/categoryColors';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface ColorPickerProps {
   value: string;
@@ -13,6 +14,8 @@ interface ColorPickerProps {
 const SWATCH_SIZE = 40;
 
 export default function ColorPicker({ value, onChange }: ColorPickerProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       <Text style={styles.label}>COLOR</Text>
@@ -43,7 +46,7 @@ export default function ColorPicker({ value, onChange }: ColorPickerProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,

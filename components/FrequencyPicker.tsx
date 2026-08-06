@@ -2,7 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { MotiView } from 'moti';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 import type { RecurringFrequency } from '../types';
 
 interface FrequencyPickerProps {
@@ -18,6 +19,7 @@ const OPTIONS: { value: RecurringFrequency; label: string }[] = [
 ];
 
 export default function FrequencyPicker({ value, onChange, disabled }: FrequencyPickerProps) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       <Text style={styles.label}>FREQUENCY</Text>
@@ -62,7 +64,7 @@ export default function FrequencyPicker({ value, onChange, disabled }: Frequency
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,

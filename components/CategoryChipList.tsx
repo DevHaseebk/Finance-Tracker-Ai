@@ -2,7 +2,8 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
 import { getCategoryIcon } from '../lib/categoryIcons';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { Category } from '../types';
 
 interface CategoryChipListProps {
@@ -16,6 +17,8 @@ export default function CategoryChipList({
   selectedId,
   onSelect,
 }: CategoryChipListProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   if (categories.length === 0) {
     return (
       <View style={styles.empty}>
@@ -67,7 +70,7 @@ export default function CategoryChipList({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   row: {
     gap: spacing.sm,
     paddingRight: spacing.lg,

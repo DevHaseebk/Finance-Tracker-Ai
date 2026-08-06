@@ -2,7 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
 import { CATEGORY_ICONS } from '../lib/categoryIcons';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface IconPickerProps {
   value: string;
@@ -14,6 +15,8 @@ interface IconPickerProps {
 const CELL_SIZE = 48;
 
 export default function IconPicker({ value, onChange, accentColor }: IconPickerProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       <Text style={styles.label}>ICON</Text>
@@ -50,7 +53,7 @@ export default function IconPicker({ value, onChange, accentColor }: IconPickerP
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,

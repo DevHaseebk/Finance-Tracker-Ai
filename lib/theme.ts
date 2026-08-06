@@ -2,7 +2,7 @@
 // Typography uses the Inter font family — load it via lib/fonts.ts before
 // rendering any screen that references `fontFamily`.
 
-export const colors = {
+export const lightColors = {
   // Brand
   primary: '#4F46E5', // indigo
   primaryLight: '#EEF2FF',
@@ -27,12 +27,64 @@ export const colors = {
   text: '#111827',
   textSecondary: '#6B7280',
   textMuted: '#9CA3AF',
+  /** Text drawn on top of a filled accent colour (primary/success/danger). */
   textInverse: '#FFFFFF',
 
   // Misc
   overlay: 'rgba(17, 24, 39, 0.4)',
   transparent: 'transparent',
 } as const;
+
+/**
+ * Not a mechanical inversion of the light palette. Accents are lifted a few
+ * steps (indigo-400 rather than indigo-600) so they stay vivid against a dark
+ * surface, and their -Light variants become deep tints for chip/badge fills
+ * instead of near-white washes. textInverse flips to near-black because the
+ * lifted accents are now light enough that dark text reads better on them.
+ */
+export const darkColors = {
+  // Brand
+  primary: '#818CF8',
+  primaryLight: '#1E1B4B',
+  primaryDark: '#A5B4FC',
+  gradient: ['#4338CA', '#4F46E5', '#6366F1'] as const,
+
+  // Feedback
+  success: '#4ADE80',
+  successLight: '#052E16',
+  danger: '#F87171',
+  dangerLight: '#450A0A',
+  warning: '#FBBF24',
+  warningLight: '#451A03',
+
+  // Surfaces
+  background: '#0B0F19',
+  card: '#151B27',
+  cardTranslucent: 'rgba(21, 27, 39, 0.7)',
+  border: '#252D3D',
+
+  // Text
+  text: '#F3F4F6',
+  textSecondary: '#9CA3AF',
+  textMuted: '#6B7280',
+  textInverse: '#0B0F19',
+
+  // Misc
+  overlay: 'rgba(0, 0, 0, 0.6)',
+  transparent: 'transparent',
+} as const;
+
+/**
+ * Both palettes widened to plain strings — otherwise each one's type is its own
+ * set of hex literals and `dark ? darkColors : lightColors` has no common type.
+ * `gradient` keeps its tuple shape because LinearGradient requires at least two
+ * positional stops.
+ */
+export type ThemeColors = Omit<
+  { readonly [K in keyof typeof lightColors]: string },
+  'gradient'
+> & { readonly gradient: readonly [string, string, string] };
+
 
 // 4 / 8 / 12 / 16 / 24 / 32 scale
 export const spacing = {
@@ -148,18 +200,6 @@ export function staggerDelay(index: number, step = 60, base = 0) {
   return base + index * step;
 }
 
-export const theme = {
-  colors,
-  spacing,
-  radius,
-  fontFamily,
-  fontSize,
-  fontWeight,
-  typography,
-  shadow,
-  motion,
-} as const;
-
-export type Theme = typeof theme;
-
-export default theme;
+// Colours are intentionally not re-exported as a single aggregate any more:
+// they depend on the active scheme and must be read through useTheme() /
+// useThemedStyles() so a theme change actually repaints.

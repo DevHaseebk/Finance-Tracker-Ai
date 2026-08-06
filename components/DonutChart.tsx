@@ -2,7 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
 import { CATEGORY_COLORS } from '../lib/categoryColors';
 import { formatCurrency } from '../lib/utils';
-import { colors, typography } from '../lib/theme';
+import { typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { CategoryBreakdownItem } from '../types';
 
 interface DonutChartProps {
@@ -14,6 +15,8 @@ const RADIUS = 84;
 const INNER_RADIUS = 58;
 
 export default function DonutChart({ data, centerLabel }: DonutChartProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const total = data.reduce((sum, item) => sum + item.amount, 0);
 
   const pieData = data.map((item, index) => ({
@@ -46,7 +49,7 @@ export default function DonutChart({ data, centerLabel }: DonutChartProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',

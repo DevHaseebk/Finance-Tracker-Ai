@@ -24,12 +24,15 @@ import { useCategoryStore } from '../store/categoryStore';
 import { validateCategoryName } from '../lib/validation';
 import { DEFAULT_CATEGORY_ICON, getCategoryIcon } from '../lib/categoryIcons';
 import { DEFAULT_CATEGORY_COLOR } from '../lib/categoryColors';
-import { colors, motion, radius, spacing, typography } from '../lib/theme';
+import { motion, radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { RootStackParamList, TransactionType } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CategoryForm'>;
 
 export default function CategoryFormScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const categoryId = route.params?.categoryId;
   const isEditing = !!categoryId;
 
@@ -219,7 +222,7 @@ export default function CategoryFormScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
   header: {

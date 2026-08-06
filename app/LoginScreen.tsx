@@ -17,12 +17,15 @@ import AnimatedPressable from '../components/AnimatedPressable';
 import TextField from '../components/TextField';
 import { useAuthStore } from '../store/authStore';
 import { validateEmail, validatePassword } from '../lib/validation';
-import { colors, motion, radius, spacing, staggerDelay, typography } from '../lib/theme';
+import { motion, radius, spacing, staggerDelay, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { AuthStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const login = useAuthStore((s) => s.login);
   const isSubmitting = useAuthStore((s) => s.isSubmitting);
 
@@ -155,7 +158,7 @@ export default function LoginScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
   content: {

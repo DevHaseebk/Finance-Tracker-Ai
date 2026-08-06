@@ -2,7 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Delete } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, fontFamily, fontSize, radius } from '../lib/theme';
+import { fontFamily, fontSize, radius, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface NumberPadProps {
   onDigit: (digit: string) => void;
@@ -17,6 +18,8 @@ const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'backspace']
  * can pop up and there's nothing to dismiss.
  */
 export default function NumberPad({ onDigit, onBackspace }: NumberPadProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.grid}>
       {KEYS.map((key, index) => {
@@ -64,7 +67,7 @@ export default function NumberPad({ onDigit, onBackspace }: NumberPadProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

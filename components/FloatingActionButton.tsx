@@ -3,7 +3,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { Plus } from 'lucide-react-native';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, shadow, spacing } from '../lib/theme';
+import { radius, shadow, spacing, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 export const FAB_SIZE = 60;
 
@@ -23,6 +24,8 @@ export default function FloatingActionButton({
   onPress,
   accessibilityLabel = 'Add transaction',
 }: FloatingActionButtonProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const insets = useSafeAreaInsets();
 
   // Sit above the tab bar: its own height plus the device's bottom inset.
@@ -50,7 +53,7 @@ export default function FloatingActionButton({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrapper: {
     position: 'absolute',
     right: spacing.lg,

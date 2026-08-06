@@ -16,10 +16,13 @@ import Skeleton from '../components/Skeleton';
 import AnalyticsSkeleton from '../components/AnalyticsSkeleton';
 import { useAnalyticsStore } from '../store/analyticsStore';
 import { RANGE_PRESET_LABELS } from '../lib/analyticsRange';
-import { colors, motion, radius, shadow, spacing, staggerDelay, typography } from '../lib/theme';
+import { motion, radius, shadow, spacing, staggerDelay, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import { FAB_CLEARANCE } from '../components/FloatingActionButton';
 
 export default function AnalyticsScreen() {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const rangePreset = useAnalyticsStore((s) => s.rangePreset);
   const breakdownType = useAnalyticsStore((s) => s.breakdownType);
   const expenseBreakdown = useAnalyticsStore((s) => s.expenseBreakdown);
@@ -207,7 +210,7 @@ export default function AnalyticsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   content: {
     padding: spacing.lg,

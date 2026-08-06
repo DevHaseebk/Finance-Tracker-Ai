@@ -1,11 +1,13 @@
 import { StyleSheet, View } from 'react-native';
 import Skeleton from './Skeleton';
-import { colors, radius, shadow, spacing } from '../lib/theme';
+import { radius, shadow, spacing, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 
 /** Mirrors DashboardScreen's real layout — balance card, quick actions, this
  * month card, recent transactions — so the swap from skeleton to real
  * content doesn't visually jump. */
 export default function DashboardSkeleton() {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       <View style={styles.card}>
@@ -49,7 +51,7 @@ export default function DashboardSkeleton() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     backgroundColor: colors.card,
     borderRadius: radius.lg,

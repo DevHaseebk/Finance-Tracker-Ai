@@ -1,6 +1,7 @@
 import type { DimensionValue, ViewStyle } from 'react-native';
 import { MotiView } from 'moti';
-import { colors, radius as radiusTokens } from '../lib/theme';
+import { radius as radiusTokens } from '../lib/theme';
+import { useTheme } from '../lib/useTheme';
 
 interface SkeletonProps {
   width?: DimensionValue;
@@ -21,6 +22,7 @@ export default function Skeleton({
   delay = 0,
   style,
 }: SkeletonProps) {
+  const { colors } = useTheme();
   return (
     <MotiView
       style={[{ width, height, borderRadius: radius, backgroundColor: colors.border }, style]}

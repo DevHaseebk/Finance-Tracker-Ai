@@ -1,7 +1,8 @@
 import { StyleSheet, TextInput, View } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface SearchInputProps {
   value: string;
@@ -14,6 +15,8 @@ export default function SearchInput({
   onChangeText,
   placeholder = 'Search notes or amount',
 }: SearchInputProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.row}>
       <Search size={16} strokeWidth={2} color={colors.textMuted} />
@@ -43,7 +46,7 @@ export default function SearchInput({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',

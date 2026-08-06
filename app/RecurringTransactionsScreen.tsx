@@ -11,12 +11,15 @@ import AnimatedPressable from '../components/AnimatedPressable';
 import { useRecurringStore } from '../store/recurringStore';
 import { getCategoryIcon } from '../lib/categoryIcons';
 import { describeRecurringSchedule, formatCurrency } from '../lib/utils';
-import { colors, motion, radius, shadow, spacing, staggerDelay, typography } from '../lib/theme';
+import { motion, radius, shadow, spacing, staggerDelay, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { RecurringTransactionWithCategory, RootStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecurringTransactions'>;
 
 export default function RecurringTransactionsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const rules = useRecurringStore((s) => s.rules);
   const isLoading = useRecurringStore((s) => s.isLoading);
   const error = useRecurringStore((s) => s.error);
@@ -172,7 +175,7 @@ export default function RecurringTransactionsScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   header: {
     flexDirection: 'row',

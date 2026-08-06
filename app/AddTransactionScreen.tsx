@@ -27,7 +27,8 @@ import { useCategoryStore } from '../store/categoryStore';
 import { useTransactionStore } from '../store/transactionStore';
 import { useRecurringStore } from '../store/recurringStore';
 import { formatCurrency } from '../lib/utils';
-import { colors, fontSize, motion, radius, shadow, spacing, typography } from '../lib/theme';
+import { fontSize, motion, radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { RecurringFrequency, RootStackParamList, TransactionType } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AddTransaction'>;
@@ -35,6 +36,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'AddTransaction'>;
 const MAX_AMOUNT_CENTS = 99_999_999; // Rs 999,999.99
 
 export default function AddTransactionScreen({ navigation, route }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const transactionId = route.params?.transactionId;
   const isEditing = !!transactionId;
 
@@ -365,7 +368,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
   header: {

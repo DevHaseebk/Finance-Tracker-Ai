@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 
 interface DayOfMonthPickerProps {
   /** 1-31. Clamped to each month's actual last day when generating. */
@@ -13,6 +14,7 @@ const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const CELL_SIZE = 36;
 
 export default function DayOfMonthPicker({ value, onChange }: DayOfMonthPickerProps) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View>
       <Text style={styles.label}>REPEATS ON</Text>
@@ -45,7 +47,7 @@ export default function DayOfMonthPicker({ value, onChange }: DayOfMonthPickerPr
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,

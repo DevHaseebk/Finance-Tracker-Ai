@@ -23,12 +23,15 @@ import {
   validateConfirmPassword,
   MIN_PASSWORD_LENGTH,
 } from '../lib/validation';
-import { colors, motion, radius, spacing, staggerDelay, typography } from '../lib/theme';
+import { motion, radius, spacing, staggerDelay, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { AuthStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignUp'>;
 
 export default function SignUpScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const signup = useAuthStore((s) => s.signup);
   const isSubmitting = useAuthStore((s) => s.isSubmitting);
 
@@ -209,7 +212,7 @@ export default function SignUpScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   flex: { flex: 1 },
   content: {

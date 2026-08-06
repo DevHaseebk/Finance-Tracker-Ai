@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { format } from 'date-fns';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import { CURRENCY_SYMBOL } from '../lib/utils';
 import type { MonthlyTrendPoint } from '../types';
 
@@ -13,13 +14,15 @@ const BAR_WIDTH = 14;
 const GROUP_SPACING = 22;
 const PAIR_SPACING = 3;
 
-// gifted-charts-core deep-clones style objects it's handed (it tags them
-// with a temporary isActiveClone marker while walking). StyleSheet.create()
-// output is frozen on web, so that clone throws — these must stay plain,
-// unfrozen object literals, never StyleSheet.create() results.
-const AXIS_LABEL_STYLE = { color: colors.textMuted, fontSize: 10 };
 
 export default function TrendBarChart({ data }: TrendBarChartProps) {
+  const { colors } = useTheme();
+  // gifted-charts-core deep-clones any style object it is handed (it tags it
+  // with a temporary isActiveClone marker while walking). StyleSheet.create()
+  // output is frozen on web, so that clone throws - this must stay a plain,
+  // unfrozen object literal, never a StyleSheet.create() result.
+  const axisLabelStyle = { color: colors.textMuted, fontSize: 10 };
+  const styles = useThemedStyles(makeStyles);
   const barData = data.flatMap((point) => [
     {
       value: point.income,
@@ -27,7 +30,7 @@ export default function TrendBarChart({ data }: TrendBarChartProps) {
       spacing: PAIR_SPACING,
       label: format(new Date(`${point.month}T00:00:00`), 'MMM'),
       labelWidth: 34,
-      labelTextStyle: AXIS_LABEL_STYLE,
+      labelTextStyle: axisLabelStyle,
       barBorderTopLeftRadius: radius.sm / 2,
       barBorderTopRightRadius: radius.sm / 2,
     },
@@ -58,7 +61,7 @@ export default function TrendBarChart({ data }: TrendBarChartProps) {
         xAxisColor={colors.border}
         xAxisThickness={1}
         hideRules
-        yAxisTextStyle={AXIS_LABEL_STYLE}
+        yAxisTextStyle={axisLabelStyle}
         yAxisLabelPrefix={`${CURRENCY_SYMBOL} `}
         height={160}
         initialSpacing={16}
@@ -69,6 +72,7 @@ export default function TrendBarChart({ data }: TrendBarChartProps) {
 }
 
 function LegendDot({ color, label }: { color: string; label: string }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.legendItem}>
       <View style={[styles.legendDot, { backgroundColor: color }]} />
@@ -77,7 +81,7 @@ function LegendDot({ color, label }: { color: string; label: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   legend: {
     flexDirection: 'row',
     gap: spacing.lg,

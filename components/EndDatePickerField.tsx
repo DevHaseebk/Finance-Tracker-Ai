@@ -6,7 +6,8 @@ import { format } from 'date-fns';
 import AnimatedPressable from './AnimatedPressable';
 import NativeDateSheet from './NativeDateSheet';
 import { openAndroidDatePicker } from '../lib/nativeDatePicker';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface EndDatePickerFieldProps {
   /** null means "no end date" (ongoing/indefinite). */
@@ -26,6 +27,8 @@ export default function EndDatePickerField({
   onChange,
   minimumDate,
 }: EndDatePickerFieldProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [iosPickerOpen, setIosPickerOpen] = useState(false);
   const hasEndDate = value !== null;
 
@@ -104,7 +107,7 @@ export default function EndDatePickerField({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,

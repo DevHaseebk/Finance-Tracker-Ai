@@ -2,7 +2,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { MotiView } from 'moti';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { TransactionType } from '../types';
 
 interface TypeToggleProps {
@@ -11,12 +12,14 @@ interface TypeToggleProps {
   disabled?: boolean;
 }
 
-const OPTIONS: { value: TransactionType; label: string; color: string }[] = [
-  { value: 'expense', label: 'Expense', color: colors.danger },
-  { value: 'income', label: 'Income', color: colors.success },
+const OPTIONS: { value: TransactionType; label: string }[] = [
+  { value: 'expense', label: 'Expense' },
+  { value: 'income', label: 'Income' },
 ];
 
 export default function TypeToggle({ value, onChange, disabled }: TypeToggleProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.track}>
       {OPTIONS.map((option) => {
@@ -44,7 +47,13 @@ export default function TypeToggle({ value, onChange, disabled }: TypeToggleProp
                   from={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ type: 'timing', duration: 150 }}
-                  style={[styles.segmentFill, { backgroundColor: option.color }]}
+                  style={[
+                    styles.segmentFill,
+                    {
+                      backgroundColor:
+                        option.value === 'income' ? colors.success : colors.danger,
+                    },
+                  ]}
                 />
               ) : null}
               <Text style={[styles.segmentLabel, selected && styles.segmentLabelSelected]}>
@@ -58,7 +67,7 @@ export default function TypeToggle({ value, onChange, disabled }: TypeToggleProp
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   track: {
     flexDirection: 'row',
     backgroundColor: colors.background,

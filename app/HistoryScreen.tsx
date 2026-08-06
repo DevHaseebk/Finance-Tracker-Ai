@@ -14,13 +14,16 @@ import HistorySkeleton from '../components/HistorySkeleton';
 import { useHistoryStore } from '../store/historyStore';
 import { useCategoryStore } from '../store/categoryStore';
 import { groupTransactionsByDate } from '../lib/utils';
-import { colors, motion, radius, spacing, typography } from '../lib/theme';
+import { motion, radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import { FAB_CLEARANCE } from '../components/FloatingActionButton';
 import type { RootStackParamList, TransactionWithCategory } from '../types';
 
 const SEARCH_DEBOUNCE_MS = 350;
 
 export default function HistoryScreen() {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const transactions = useHistoryStore((s) => s.transactions);
   const filters = useHistoryStore((s) => s.filters);
@@ -185,7 +188,7 @@ function TransactionRow({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   content: {
     paddingHorizontal: spacing.lg,

@@ -2,7 +2,8 @@ import { Modal, Pressable, StyleSheet, Text } from 'react-native';
 import { Check } from 'lucide-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AnimatedPressable from './AnimatedPressable';
-import { colors, radius, shadow, spacing, typography } from '../lib/theme';
+import { radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface NativeDateSheetProps {
   visible: boolean;
@@ -22,6 +23,8 @@ export default function NativeDateSheet({
   onChange,
   onClose,
 }: NativeDateSheetProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <Modal transparent animationType="fade" visible={visible}>
       <Pressable style={styles.backdrop} onPress={onClose}>
@@ -52,7 +55,7 @@ export default function NativeDateSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   backdrop: {
     flex: 1,
     backgroundColor: colors.overlay,

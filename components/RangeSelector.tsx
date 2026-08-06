@@ -2,7 +2,8 @@ import { ScrollView, StyleSheet, Text } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import AnimatedPressable from './AnimatedPressable';
 import { RANGE_PRESETS, RANGE_PRESET_LABELS } from '../lib/analyticsRange';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles } from '../lib/useTheme';
 import type { AnalyticsRangePreset } from '../types';
 
 interface RangeSelectorProps {
@@ -11,6 +12,7 @@ interface RangeSelectorProps {
 }
 
 export default function RangeSelector({ value, onChange }: RangeSelectorProps) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <ScrollView
       horizontal
@@ -45,7 +47,7 @@ export default function RangeSelector({ value, onChange }: RangeSelectorProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   row: {
     gap: spacing.sm,
     paddingRight: spacing.lg,

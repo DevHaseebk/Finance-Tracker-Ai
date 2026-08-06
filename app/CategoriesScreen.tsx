@@ -18,12 +18,15 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AnimatedPressable from '../components/AnimatedPressable';
 import { useCategoryStore } from '../store/categoryStore';
 import { getCategoryIcon } from '../lib/categoryIcons';
-import { colors, motion, radius, shadow, spacing, staggerDelay, typography } from '../lib/theme';
+import { motion, radius, shadow, spacing, staggerDelay, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { Category, RootStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Categories'>;
 
 export default function CategoriesScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const categories = useCategoryStore((s) => s.categories);
   const isLoading = useCategoryStore((s) => s.isLoading);
   const error = useCategoryStore((s) => s.error);
@@ -198,7 +201,7 @@ export default function CategoriesScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   header: {
     flexDirection: 'row',

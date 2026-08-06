@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 import { MotiView } from 'moti';
 import { Eye, EyeOff, type LucideIcon } from 'lucide-react-native';
-import { colors, radius, spacing, typography } from '../lib/theme';
+import { radius, spacing, typography, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 
 interface TextFieldProps extends TextInputProps {
   label: string;
@@ -23,6 +24,8 @@ const TextField = forwardRef<TextInput, TextFieldProps>(function TextField(
   { label, error, icon: Icon, isPassword = false, ...inputProps },
   ref
 ) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [focused, setFocused] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -87,7 +90,7 @@ const TextField = forwardRef<TextInput, TextFieldProps>(function TextField(
 
 export default TextField;
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrapper: {
     marginBottom: spacing.lg,
   },

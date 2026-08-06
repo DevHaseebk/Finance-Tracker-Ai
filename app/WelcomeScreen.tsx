@@ -5,12 +5,15 @@ import { MotiView } from 'moti';
 import { Sparkles, ArrowRight } from 'lucide-react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AnimatedPressable from '../components/AnimatedPressable';
-import { colors, radius, spacing, typography, motion, staggerDelay } from '../lib/theme';
+import { radius, spacing, typography, motion, staggerDelay, type ThemeColors } from '../lib/theme';
+import { useThemedStyles, useTheme } from '../lib/useTheme';
 import type { AuthStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
 
 export default function WelcomeScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const handleGetStarted = () => {
     navigation.navigate('SignUp');
   };
@@ -88,7 +91,7 @@ export default function WelcomeScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
