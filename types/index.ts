@@ -69,6 +69,35 @@ export interface RecurringTransactionWithCategory extends RecurringTransaction {
   categoryColor?: string;
 }
 
+export type AnalyticsRangePreset =
+  | 'thisMonth'
+  | 'lastMonth'
+  | 'last3Months'
+  | 'last6Months'
+  | 'thisYear'
+  | 'allTime';
+
+export interface CategoryBreakdownItem {
+  categoryId: string;
+  name: string;
+  icon?: string;
+  color?: string;
+  amount: number;
+  /** 0-100, computed client-side from the totals in the same response. */
+  percent: number;
+}
+
+export interface MonthlyTrendPoint {
+  month: string; // yyyy-MM-dd, first of the month
+  income: number;
+  expense: number;
+}
+
+export interface SavingsTrendPoint {
+  month: string; // yyyy-MM-dd, first of the month
+  balance: number;
+}
+
 /** Screens shown while logged out. */
 export type AuthStackParamList = {
   Welcome: undefined;
