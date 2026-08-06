@@ -26,6 +26,7 @@ import AnalyticsScreen from './AnalyticsScreen';
 import SettingsScreen from './SettingsScreen';
 import AddTransactionScreen from './AddTransactionScreen';
 import CategoriesScreen from './CategoriesScreen';
+import CategoryFormScreen from './CategoryFormScreen';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const AppStack = createNativeStackNavigator<RootStackParamList>();
@@ -132,6 +133,11 @@ function AppFlow() {
         options={{ presentation: 'modal' }}
       />
       <AppStack.Screen name="Categories" component={CategoriesScreen} />
+      <AppStack.Screen
+        name="CategoryForm"
+        component={CategoryFormScreen}
+        options={{ presentation: 'modal' }}
+      />
     </AppStack.Navigator>
   );
 }

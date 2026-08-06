@@ -17,7 +17,8 @@ export interface Category {
   type: TransactionType;
   icon?: string;
   color?: string;
-  isDefault?: boolean;
+  isDefault: boolean;
+  isHidden: boolean;
 }
 
 /** Screens shown while logged out. */
@@ -33,6 +34,8 @@ export type RootStackParamList = {
   /** Presented modally over the tabs from the floating action button. */
   AddTransaction: undefined;
   Categories: undefined;
+  /** Omit categoryId to create; pass it to edit an existing custom category. */
+  CategoryForm: { categoryId?: string } | undefined;
   TransactionDetail: { id: string };
 };
 
