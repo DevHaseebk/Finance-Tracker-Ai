@@ -46,7 +46,7 @@ export default function AddTransactionScreen({ navigation, route }: Props) {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const [type, setType] = useState<TransactionType>('expense');
+  const [type, setType] = useState<TransactionType>(route.params?.initialType ?? 'expense');
   const [amountCents, setAmountCents] = useState(0);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [date, setDate] = useState<Date>(new Date());
