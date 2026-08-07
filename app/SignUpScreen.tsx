@@ -88,7 +88,7 @@ export default function SignUpScreen({ navigation }: Props) {
     Toast.show({
       type: 'success',
       text1: 'Account created',
-      text2: 'Welcome to CashFlow AI.',
+      text2: 'Welcome to Finance Tracker AI.',
     });
   };
 

@@ -1,0 +1,54 @@
+# Files excluded from the tarball uploaded to EAS Build.
+#
+# IMPORTANT: .easignore REPLACES .gitignore for the upload — it is not additive.
+# Everything in .gitignore must be repeated here or it will start being
+# uploaded. Keep the two in sync; .env in particular holds live Supabase keys.
+
+# --- mirrored from .gitignore ---
+node_modules/
+
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+credentials.json
+*.keystore
+*.apk
+*.aab
+build-*.tar.gz
+
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+.DS_Store
+*.pem
+
+# Never upload: remote builds read env vars from EAS, not from this file.
+.env
+.env*.local
+
+*.tsbuildinfo
+
+# Regenerated on the build server by prebuild (Continuous Native Generation).
+/ios
+/android
+
+# --- EAS-only exclusions ---
+# Repo material a native build has no use for.
+supabase/
+.claude/
+.git/
+AGENTS.md
+CLAUDE.md
+README.md

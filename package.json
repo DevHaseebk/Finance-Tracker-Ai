@@ -1,5 +1,5 @@
 {
-  "name": "cashflow-ai",
+  "name": "finance-tracker-ai",
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
@@ -13,9 +13,11 @@
     "date-fns": "^4.4.0",
     "expo": "~57.0.10",
     "expo-blur": "~57.0.2",
+    "expo-dev-client": "~57.0.10",
     "expo-font": "~57.0.1",
     "expo-haptics": "~57.0.1",
     "expo-linear-gradient": "~57.0.1",
+    "expo-notifications": "~57.0.9",
     "expo-splash-screen": "~57.0.5",
     "expo-status-bar": "~57.0.1",
     "lucide-react-native": "^1.28.0",
@@ -37,6 +39,7 @@
   "devDependencies": {
     "@types/react": "~19.2.2",
     "babel-preset-expo": "^57.0.5",
+    "eas-cli": "^21.7.0",
     "typescript": "~6.0.3"
   },
   "overrides": {

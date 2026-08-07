@@ -11,6 +11,11 @@ import type { AuthStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Welcome'>;
 
+// The welcome hero renders on the indigo gradient in both themes, so its text
+// is always white rather than colors.textInverse, which flips to near-black in
+// dark mode and would disappear against the gradient.
+const ON_GRADIENT = '#FFFFFF';
+
 export default function WelcomeScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
@@ -40,12 +45,12 @@ export default function WelcomeScreen({ navigation }: Props) {
       <View style={styles.content}>
         <MotiView {...motion.slideUp} delay={staggerDelay(0)}>
           <View style={styles.iconBadge}>
-            <Sparkles color={colors.textInverse} size={32} strokeWidth={2} />
+            <Sparkles color={ON_GRADIENT} size={32} strokeWidth={2} />
           </View>
         </MotiView>
 
         <MotiView {...motion.slideUp} delay={staggerDelay(1)}>
-          <Text style={styles.title}>CashFlow AI</Text>
+          <Text style={styles.title}>Finance Tracker AI</Text>
         </MotiView>
 
         <MotiView {...motion.slideUp} delay={staggerDelay(2)}>
@@ -122,7 +127,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   title: {
     ...typography.display,
-    color: colors.textInverse,
+    color: ON_GRADIENT,
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
@@ -152,7 +157,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   glassCardValue: {
     ...typography.h1,
-    color: colors.textInverse,
+    color: ON_GRADIENT,
     marginBottom: spacing.xs,
   },
   glassCardHint: {

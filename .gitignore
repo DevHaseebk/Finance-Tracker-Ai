@@ -18,6 +18,14 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# EAS — signing material and local build output. eas.json itself IS committed
+# (it holds no secrets); credentials.json and keystores must never be.
+credentials.json
+*.keystore
+*.apk
+*.aab
+build-*.tar.gz
+
 # Metro
 .metro-health-check*
 

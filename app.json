@@ -1,22 +1,28 @@
 {
   "expo": {
-    "name": "cashflow-ai",
-    "slug": "cashflow-ai",
+    "name": "Finance Tracker Ai",
+    "slug": "finance-tracker-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.haseebkhan.financetrackerai"
     },
     "android": {
+      "package": "com.haseebkhan.financetrackerai",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "POST_NOTIFICATIONS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -24,7 +30,20 @@
     "plugins": [
       "expo-font",
       "expo-splash-screen",
-      "@react-native-community/datetimepicker"
-    ]
+      "@react-native-community/datetimepicker",
+      "expo-dev-client",
+      [
+        "expo-notifications",
+        {
+          "color": "#4F46E5"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "718edefc-23bf-4598-b1d8-b4d5d37c83e8"
+      }
+    },
+    "owner": "dev.mhaseebkhan"
   }
 }
