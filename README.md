@@ -48,22 +48,34 @@ The anon key is a publishable key protected by row-level security, so
 ### Build commands
 
 ```bash
-eas build --profile development --platform android
+npm run build:dev
 ```
 
 ```bash
-eas build --profile preview --platform android
+npm run build:preview
 ```
 
 ```bash
-eas build --profile production --platform android
+npm run build:prod
 ```
+
+`npm run build` is an alias for `build:preview`, since that's the one used
+for real-device testing day to day. Each of these is a thin wrapper around
+the matching `eas build --profile <name> --platform android` — use the raw
+`eas build` form directly if you need extra flags (e.g. `--local`,
+`--non-interactive`).
 
 | Profile | Output | Distribution | Use |
 | --- | --- | --- | --- |
 | `development` | APK | internal | Debug build with `expo-dev-client`; pairs with a running Metro server. |
 | `preview` | APK | internal | Installable release build — this is the one for real-device testing. |
 | `production` | AAB | store | Play Store upload artifact. |
+
+**Preview and production embed the JS bundle at build time** — unlike a
+`development` build, they are not connected to Metro. Any JS/TS change (a
+screen, a store, navigation) needs a new `preview`/`production` build to
+show up on a device already running an older one. A `development` build
+just needs an app reload; it pulls fresh JS from Metro.
 
 ### Versioning
 
