@@ -1,6 +1,7 @@
+import { useCallback } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MotiView } from 'moti';
 import {
@@ -12,12 +13,15 @@ import {
   Monitor,
   Sun,
   Moon,
+  Wallet,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Toast from 'react-native-toast-message';
 import AnimatedPressable from '../components/AnimatedPressable';
 import { useAuthStore } from '../store/authStore';
 import { useThemeStore, type ThemeMode } from '../store/themeStore';
+import { useSettingsStore } from '../store/settingsStore';
+import { formatCurrency } from '../lib/utils';
 import { motion, radius, shadow, spacing, typography, type ThemeColors } from '../lib/theme';
 import { useThemedStyles, useTheme } from '../lib/useTheme';
 import { FAB_CLEARANCE } from '../components/FloatingActionButton';
@@ -38,6 +42,16 @@ export default function SettingsScreen() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const isSubmitting = useAuthStore((s) => s.isSubmitting);
+  const startingBalance = useSettingsStore((s) => s.startingBalance);
+  const fetchSettings = useSettingsStore((s) => s.fetchSettings);
+
+  // Refetch on focus so returning from the edit modal shows the saved value
+  // without a manual refresh.
+  useFocusEffect(
+    useCallback(() => {
+      fetchSettings();
+    }, [fetchSettings])
+  );
 
   const handleLogout = async () => {
     const { error } = await logout();
@@ -101,6 +115,26 @@ export default function SettingsScreen() {
               );
             })}
           </View>
+        </MotiView>
+
+        <MotiView {...motion.cardEntrance} delay={60}>
+          <AnimatedPressable
+            onPress={() => navigation.navigate('StartingBalance')}
+            haptic="light"
+            scaleTo={0.98}
+            style={styles.card}
+            accessibilityRole="button"
+            accessibilityLabel="Edit previous balance"
+          >
+            <View style={styles.row}>
+              <Wallet size={18} strokeWidth={2} color={colors.textSecondary} />
+              <View style={styles.rowText}>
+                <Text style={styles.rowLabel}>PREVIOUS BALANCE</Text>
+                <Text style={styles.rowValue}>{formatCurrency(startingBalance)}</Text>
+              </View>
+              <ChevronRight size={18} strokeWidth={2} color={colors.textMuted} />
+            </View>
+          </AnimatedPressable>
         </MotiView>
 
         <MotiView {...motion.cardEntrance} delay={80}>

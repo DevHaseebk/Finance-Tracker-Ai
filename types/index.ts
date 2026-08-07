@@ -123,6 +123,8 @@ export type RootStackParamList = {
    * rules are always created via AddTransaction's recurring toggle. */
   RecurringForm: { recurringId: string };
   TransactionDetail: { id: string };
+  /** Edits the balance carried in from before the user started tracking here. */
+  StartingBalance: undefined;
 };
 
 export type TabParamList = {

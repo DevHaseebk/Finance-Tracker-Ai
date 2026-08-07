@@ -146,12 +146,24 @@ export const useRecurringStore = create<RecurringState>((set, get) => ({
       return { error: 'You must be signed in to add a recurring transaction.' };
     }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('recurring_transactions')
-      .insert(toInsertPayload(userId, input));
+      .insert(toInsertPayload(userId, input))
+      .select('id')
+      .single();
 
     set({ isMutating: false });
     if (error) return { error: error.message };
+
+    // Backfills any occurrences already due (a past or today's start_date) so
+    // they show up immediately. This has to be awaited, not fire-and-forget —
+    // the caller navigates back right after this resolves and Dashboard/
+    // History refetch on focus, so an un-awaited call would frequently lose
+    // that race and the new transaction wouldn't appear until the next pull-
+    // to-refresh. A failure here isn't surfaced as a save error — the rule
+    // itself was created fine, and tomorrow's cron will catch up regardless.
+    await supabase.rpc('generate_recurring_backfill_for_rule', { p_recurring_id: data.id });
+
     return { error: null };
   },
 
@@ -181,6 +193,11 @@ export const useRecurringStore = create<RecurringState>((set, get) => ({
     set((state) => ({
       rules: state.rules.map((r) => (r.id === id ? mapRow(data) : r)),
     }));
+
+    // Same awaited backfill as addRule, same reason — covers editing a rule
+    // that was created then immediately edited before ever generating.
+    await supabase.rpc('generate_recurring_backfill_for_rule', { p_recurring_id: id });
+
     return { error: null };
   },
 
